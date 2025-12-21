@@ -1,0 +1,71 @@
+{
+  "name": "trufi-server-poi_extractor",
+  "version": "1.0.0",
+  "description": "Extract Points of Interest (POIs) from OpenStreetMap PBF files or Overpass API queries and output GeoJSON",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "poi-extractor": "./dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "categories.example.json"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/cli.ts",
+    "start": "node dist/cli.js",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run clean && npm run build",
+    "typecheck": "tsc --noEmit",
+    "extract:pbf": "tsx src/cli.ts -i base.osm.pbf -o ./out -v",
+    "extract:overpass": "tsx src/cli.ts --bbox -17.45,-66.25,-17.30,-66.10 -o ./out -v"
+  },
+  "keywords": [
+    "osm",
+    "openstreetmap",
+    "poi",
+    "points-of-interest",
+    "geojson",
+    "pbf",
+    "overpass",
+    "overpass-turbo",
+    "gis",
+    "mapping",
+    "trufi",
+    "transit",
+    "geography"
+  ],
+  "author": "Trufi Association <info@trufi-association.org>",
+  "license": "GPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/trufi-association/trufi-server-poi_extractor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/trufi-association/trufi-server-poi_extractor/issues"
+  },
+  "homepage": "https://github.com/trufi-association/trufi-server-poi_extractor#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "osm-pbf-parser": "^2.1.0",
+    "through2": "^4.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/through2": "^2.0.41",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  }
+}

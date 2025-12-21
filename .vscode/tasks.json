@@ -1,0 +1,39 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build",
+      "type": "npm",
+      "script": "build",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": ["$tsc"]
+    },
+    {
+      "label": "Type Check",
+      "type": "npm",
+      "script": "typecheck",
+      "problemMatcher": ["$tsc"]
+    },
+    {
+      "label": "Extract POIs (PBF)",
+      "type": "npm",
+      "script": "extract:pbf",
+      "problemMatcher": []
+    },
+    {
+      "label": "Extract POIs (Overpass)",
+      "type": "npm",
+      "script": "extract:overpass",
+      "problemMatcher": []
+    },
+    {
+      "label": "Clean",
+      "type": "npm",
+      "script": "clean",
+      "problemMatcher": []
+    }
+  ]
+}

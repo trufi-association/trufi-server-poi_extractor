@@ -1,0 +1,48 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Output directories
+out/
+output/
+examples/*/output/
+
+# OSM data files (large binary files)
+*.osm.pbf
+*.osm
+*.pbf
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Test coverage
+coverage/
+
+# Dart/Flutter (if using pubspec)
+.dart_tool/
+.packages
+build/
+pubspec.lock
