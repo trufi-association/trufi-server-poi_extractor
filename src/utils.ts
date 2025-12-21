@@ -21,10 +21,10 @@ import type {
 } from './types.js';
 
 /**
- * Check if OSM tags match a category's matchers
+ * Check if OSM tags match matchers
  */
-export function matchesCategory(tags: OSMTags, category: POICategory): boolean {
-  for (const matcher of category.matchers) {
+function matchesMatchers(tags: OSMTags, matchers: Array<{ key: string; values: string[] | null }>): boolean {
+  for (const matcher of matchers) {
     if (tags[matcher.key]) {
       if (matcher.values === null || matcher.values.includes(tags[matcher.key])) {
         return true;
@@ -35,12 +35,36 @@ export function matchesCategory(tags: OSMTags, category: POICategory): boolean {
 }
 
 /**
- * Find which category an element belongs to based on its tags
+ * Check if OSM tags match a category's matchers
  */
-export function findCategory(tags: OSMTags, categories: CategoriesConfig): string | null {
-  for (const [name, category] of Object.entries(categories)) {
-    if (matchesCategory(tags, category)) {
-      return name;
+export function matchesCategory(tags: OSMTags, category: POICategory): boolean {
+  if (category.matchers && category.matchers.length > 0) {
+    return matchesMatchers(tags, category.matchers);
+  }
+  return false;
+}
+
+/**
+ * Find which category and subcategory an element belongs to based on its tags
+ * Returns: { category: string, subcategory?: string } or null
+ */
+export function findCategory(
+  tags: OSMTags,
+  categories: CategoriesConfig
+): { category: string; subcategory?: string } | null {
+  for (const [categoryName, category] of Object.entries(categories)) {
+    // Check subcategories first if they exist
+    if (category.subcategories && category.subcategories.length > 0) {
+      for (const subcategory of category.subcategories) {
+        if (matchesMatchers(tags, subcategory.matchers)) {
+          return { category: categoryName, subcategory: subcategory.name };
+        }
+      }
+    }
+
+    // Check category-level matchers if no subcategory matched
+    if (category.matchers && matchesMatchers(tags, category.matchers)) {
+      return { category: categoryName };
     }
   }
   return null;
@@ -55,7 +79,8 @@ export function createPointFeature(
   lon: number,
   tags: OSMTags,
   category: string,
-  osmType: 'node' | 'way' | 'relation' = 'node'
+  osmType: 'node' | 'way' | 'relation' = 'node',
+  subcategory?: string
 ): GeoJSONFeature {
   return {
     type: 'Feature',
@@ -69,6 +94,7 @@ export function createPointFeature(
       name: tags?.name || '',
       type: getMainTagValue(tags),
       category,
+      subcategory,
       osmType,
       ...tags
     }
@@ -83,7 +109,8 @@ export function createPolygonFeature(
   tags: OSMTags,
   osmId: number,
   category: string,
-  osmType: 'way' | 'relation' = 'way'
+  osmType: 'way' | 'relation' = 'way',
+  subcategory?: string
 ): GeoJSONFeature | null {
   if (!nodes || nodes.length < 3) return null;
 
@@ -110,6 +137,7 @@ export function createPolygonFeature(
       name: tags?.name || '',
       type: getMainTagValue(tags),
       category,
+      subcategory,
       osmType,
       ...tags
     }
@@ -202,7 +230,8 @@ export function createMultiPolygonFeature(
   outerWays: CachedNode[][],
   tags: OSMTags,
   osmId: number,
-  category: string
+  category: string,
+  subcategory?: string
 ): GeoJSONFeature | null {
   if (!outerWays || outerWays.length === 0) return null;
 
@@ -240,6 +269,7 @@ export function createMultiPolygonFeature(
       name: tags?.name || '',
       type: getMainTagValue(tags),
       category,
+      subcategory,
       osmType: 'relation',
       ...tags
     }

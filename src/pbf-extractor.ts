@@ -98,17 +98,18 @@ export async function extractFromPBF(options: PBFExtractorOptions): Promise<Extr
             if (item.tags) {
               nodeCount++;
 
-              const category = findCategory(item.tags, categories);
-              if (category) {
+              const categoryMatch = findCategory(item.tags, categories);
+              if (categoryMatch) {
                 const feature = createPointFeature(
                   item.id,
                   item.lat,
                   item.lon,
                   item.tags,
-                  category,
-                  'node'
+                  categoryMatch.category,
+                  'node',
+                  categoryMatch.subcategory
                 );
-                poisByCategory[category].push(feature);
+                poisByCategory[categoryMatch.category].push(feature);
                 poiCount++;
               }
 
@@ -133,15 +134,22 @@ export async function extractFromPBF(options: PBFExtractorOptions): Promise<Extr
             }
 
             if (item.tags) {
-              const category = findCategory(item.tags, categories);
-              if (category && wayNodes.length >= 3 && completeness >= 0.9) {
+              const categoryMatch = findCategory(item.tags, categories);
+              if (categoryMatch && wayNodes.length >= 3 && completeness >= 0.9) {
                 const hasName = item.tags?.name && !item.tags.name.toLowerCase().includes('jardinera');
                 const isLargeEnough = wayNodes.length >= 15;
 
                 if (hasName || isLargeEnough) {
-                  const feature = createPolygonFeature(wayNodes, item.tags, item.id, category, 'way');
+                  const feature = createPolygonFeature(
+                    wayNodes,
+                    item.tags,
+                    item.id,
+                    categoryMatch.category,
+                    'way',
+                    categoryMatch.subcategory
+                  );
                   if (feature) {
-                    poisByCategory[category].push(feature);
+                    poisByCategory[categoryMatch.category].push(feature);
                     poiCount++;
                   }
                 }
@@ -157,8 +165,8 @@ export async function extractFromPBF(options: PBFExtractorOptions): Promise<Extr
           if (item.type === 'relation' && item.tags) {
             relationCount++;
 
-            const category = findCategory(item.tags, categories);
-            if (category && item.tags.type === 'multipolygon') {
+            const categoryMatch = findCategory(item.tags, categories);
+            if (categoryMatch && item.tags.type === 'multipolygon') {
               const outerWays: CachedNode[][] = [];
 
               for (const member of item.members || []) {
@@ -178,9 +186,15 @@ export async function extractFromPBF(options: PBFExtractorOptions): Promise<Extr
                 const totalNodes = outerWays.reduce((sum, way) => sum + way.length, 0);
 
                 if (totalNodes >= 15 || hasName) {
-                  const feature = createMultiPolygonFeature(outerWays, item.tags, item.id, category);
+                  const feature = createMultiPolygonFeature(
+                    outerWays,
+                    item.tags,
+                    item.id,
+                    categoryMatch.category,
+                    categoryMatch.subcategory
+                  );
                   if (feature) {
-                    poisByCategory[category].push(feature);
+                    poisByCategory[categoryMatch.category].push(feature);
                     poiCount++;
                   }
                 }
@@ -220,16 +234,32 @@ export async function extractFromPBF(options: PBFExtractorOptions): Promise<Extr
           fs.writeFileSync(outputFile, JSON.stringify(geojson, null, 2));
         }
 
-        // Create metadata
+        // Create metadata with subcategory counts
         const metadata: ExtractionMetadata = {
           generated: new Date().toISOString(),
           source: path.basename(inputFile),
           bbox,
-          categories: Object.keys(categories).map(name => ({
-            name,
-            displayName: categories[name].displayName,
-            count: counts[name]
-          })),
+          categories: Object.keys(categories).map(name => {
+            const category = categories[name];
+            const categoryPOIs = poisByCategory[name];
+
+            // Calculate subcategory counts
+            let subcategoriesMetadata;
+            if (category.subcategories && category.subcategories.length > 0) {
+              subcategoriesMetadata = category.subcategories.map(sub => ({
+                name: sub.name,
+                displayName: sub.displayName,
+                count: categoryPOIs.filter(poi => poi.properties.subcategory === sub.name).length
+              }));
+            }
+
+            return {
+              name,
+              displayName: category.displayName,
+              count: counts[name],
+              subcategories: subcategoriesMetadata
+            };
+          }),
           total: poiCount
         };
 

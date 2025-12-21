@@ -55,17 +55,39 @@ function buildOverpassQuery(bbox: BoundingBox, categories: CategoriesConfig): st
   const queries: string[] = [];
 
   for (const [_name, category] of Object.entries(categories)) {
-    for (const matcher of category.matchers) {
-      if (matcher.values === null) {
-        // Match any value for this key
-        queries.push(`node["${matcher.key}"](${bboxStr});`);
-        queries.push(`way["${matcher.key}"](${bboxStr});`);
-        queries.push(`relation["${matcher.key}"](${bboxStr});`);
-      } else {
-        for (const value of matcher.values) {
-          queries.push(`node["${matcher.key}"="${value}"](${bboxStr});`);
-          queries.push(`way["${matcher.key}"="${value}"](${bboxStr});`);
-          queries.push(`relation["${matcher.key}"="${value}"](${bboxStr});`);
+    // Process category-level matchers if they exist
+    if (category.matchers) {
+      for (const matcher of category.matchers) {
+        if (matcher.values === null) {
+          // Match any value for this key
+          queries.push(`node["${matcher.key}"](${bboxStr});`);
+          queries.push(`way["${matcher.key}"](${bboxStr});`);
+          queries.push(`relation["${matcher.key}"](${bboxStr});`);
+        } else {
+          for (const value of matcher.values) {
+            queries.push(`node["${matcher.key}"="${value}"](${bboxStr});`);
+            queries.push(`way["${matcher.key}"="${value}"](${bboxStr});`);
+            queries.push(`relation["${matcher.key}"="${value}"](${bboxStr});`);
+          }
+        }
+      }
+    }
+
+    // Process subcategory matchers if they exist
+    if (category.subcategories && category.subcategories.length > 0) {
+      for (const subcategory of category.subcategories) {
+        for (const matcher of subcategory.matchers) {
+          if (matcher.values === null) {
+            queries.push(`node["${matcher.key}"](${bboxStr});`);
+            queries.push(`way["${matcher.key}"](${bboxStr});`);
+            queries.push(`relation["${matcher.key}"](${bboxStr});`);
+          } else {
+            for (const value of matcher.values) {
+              queries.push(`node["${matcher.key}"="${value}"](${bboxStr});`);
+              queries.push(`way["${matcher.key}"="${value}"](${bboxStr});`);
+              queries.push(`relation["${matcher.key}"="${value}"](${bboxStr});`);
+            }
+          }
         }
       }
     }
@@ -125,8 +147,8 @@ function processOverpassResponse(
   for (const element of data.elements) {
     if (!element.tags) continue;
 
-    const category = findCategory(element.tags, categories);
-    if (!category) continue;
+    const categoryMatch = findCategory(element.tags, categories);
+    if (!categoryMatch) continue;
 
     if (element.type === 'node' && element.lat !== undefined && element.lon !== undefined) {
       const feature = createPointFeature(
@@ -134,10 +156,11 @@ function processOverpassResponse(
         element.lat,
         element.lon,
         element.tags,
-        category,
-        'node'
+        categoryMatch.category,
+        'node',
+        categoryMatch.subcategory
       );
-      poisByCategory[category].push(feature);
+      poisByCategory[categoryMatch.category].push(feature);
     } else if (element.type === 'way' && element.nodes && element.nodes.length > 0) {
       // Get way geometry from node cache or inline geometry
       let wayNodes: CachedNode[];
@@ -151,16 +174,31 @@ function processOverpassResponse(
       }
 
       if (wayNodes.length >= 3) {
-        const feature = createPolygonFeature(wayNodes, element.tags, element.id, category, 'way');
+        const feature = createPolygonFeature(
+          wayNodes,
+          element.tags,
+          element.id,
+          categoryMatch.category,
+          'way',
+          categoryMatch.subcategory
+        );
         if (feature) {
-          poisByCategory[category].push(feature);
+          poisByCategory[categoryMatch.category].push(feature);
         }
       } else if (wayNodes.length > 0) {
         // Fall back to centroid point
         const lat = wayNodes.reduce((sum, n) => sum + n.lat, 0) / wayNodes.length;
         const lon = wayNodes.reduce((sum, n) => sum + n.lon, 0) / wayNodes.length;
-        const feature = createPointFeature(element.id, lat, lon, element.tags, category, 'way');
-        poisByCategory[category].push(feature);
+        const feature = createPointFeature(
+          element.id,
+          lat,
+          lon,
+          element.tags,
+          categoryMatch.category,
+          'way',
+          categoryMatch.subcategory
+        );
+        poisByCategory[categoryMatch.category].push(feature);
       }
     } else if (element.type === 'relation') {
       // For relations, try to get center point from members
@@ -190,10 +228,11 @@ function processOverpassResponse(
             centerLat / count,
             centerLon / count,
             element.tags,
-            category,
-            'relation'
+            categoryMatch.category,
+            'relation',
+            categoryMatch.subcategory
           );
-          poisByCategory[category].push(feature);
+          poisByCategory[categoryMatch.category].push(feature);
         }
       }
     }
@@ -273,16 +312,32 @@ export async function extractFromOverpass(options: OverpassExtractorOptions): Pr
     fs.writeFileSync(outputFile, JSON.stringify(geojson, null, 2));
   }
 
-  // Create metadata
+  // Create metadata with subcategory counts
   const metadata: ExtractionMetadata = {
     generated: new Date().toISOString(),
     source: `overpass-api:${formatBbox(bbox)}`,
     bbox,
-    categories: Object.keys(categories).map(name => ({
-      name,
-      displayName: categories[name].displayName,
-      count: counts[name]
-    })),
+    categories: Object.keys(categories).map(name => {
+      const category = categories[name];
+      const categoryPOIs = poisByCategory[name];
+
+      // Calculate subcategory counts
+      let subcategoriesMetadata;
+      if (category.subcategories && category.subcategories.length > 0) {
+        subcategoriesMetadata = category.subcategories.map(sub => ({
+          name: sub.name,
+          displayName: sub.displayName,
+          count: categoryPOIs.filter(poi => poi.properties.subcategory === sub.name).length
+        }));
+      }
+
+      return {
+        name,
+        displayName: category.displayName,
+        count: counts[name],
+        subcategories: subcategoriesMetadata
+      };
+    }),
     total
   };
 

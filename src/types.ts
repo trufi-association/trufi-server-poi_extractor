@@ -49,9 +49,16 @@ export interface TagMatcher {
   values: string[] | null; // null means match any value
 }
 
-export interface POICategory {
+export interface POISubcategory {
+  name: string;
   displayName: string;
   matchers: TagMatcher[];
+}
+
+export interface POICategory {
+  displayName: string;
+  matchers?: TagMatcher[]; // Optional for categories with only subcategories
+  subcategories?: POISubcategory[];
 }
 
 export type CategoriesConfig = Record<string, POICategory>;
@@ -83,8 +90,9 @@ export interface GeoJSONFeature {
     name: string;
     type: string;
     category: string;
+    subcategory?: string;
     osmType: 'node' | 'way' | 'relation';
-    [key: string]: string | number;
+    [key: string]: string | number | undefined;
   };
 }
 
@@ -94,10 +102,17 @@ export interface GeoJSONFeatureCollection {
 }
 
 // Metadata Types
+export interface SubcategoryMetadata {
+  name: string;
+  displayName: string;
+  count: number;
+}
+
 export interface CategoryMetadata {
   name: string;
   displayName: string;
   count: number;
+  subcategories?: SubcategoryMetadata[];
 }
 
 export interface ExtractionMetadata {
