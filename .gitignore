@@ -4,10 +4,6 @@ node_modules/
 # Build output
 dist/
 
-# OSM data files (large binary files)
-*.osm.pbf
-*.osm
-*.pbf
 
 # IDE
 .idea/

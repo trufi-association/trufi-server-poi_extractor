@@ -19,8 +19,8 @@ async function main() {
   console.log('Location: Cochabamba, Bolivia');
   console.log('===========================================\n');
 
-  // Path to the PBF file (using the one in repository root)
-  const inputFile = path.join(__dirname, '../../base.osm.pbf');
+  // Path to the PBF file (local to this example)
+  const inputFile = path.join(__dirname, 'cochabamba.osm.pbf');
   const outputDir = path.join(__dirname, 'output');
 
   try {
