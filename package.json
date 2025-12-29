@@ -25,6 +25,7 @@
     "dev": "tsx src/cli.ts",
     "start": "node dist/cli.js",
     "clean": "rm -rf dist",
+    "prepare": "npm run build",
     "prepublishOnly": "npm run clean && npm run build",
     "typecheck": "tsc --noEmit",
     "extract:pbf": "tsx src/cli.ts -i base.osm.pbf -o ./out -v",
@@ -60,12 +61,12 @@
   },
   "dependencies": {
     "osm-pbf-parser": "^2.1.0",
-    "through2": "^4.0.2"
+    "through2": "^4.0.2",
+    "typescript": "^5.3.3"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
     "@types/through2": "^2.0.41",
-    "tsx": "^4.7.0",
-    "typescript": "^5.3.3"
+    "tsx": "^4.7.0"
   }
 }
