@@ -9,7 +9,7 @@
 
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { extractFromPBF, DEFAULT_CATEGORIES } from '../../src/index.js';
+import { extractFromPBF, CATEGORIES } from '../../src/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -27,8 +27,9 @@ async function main() {
     const result = await extractFromPBF({
       inputFile,
       outputDir,
-      categories: DEFAULT_CATEGORIES,
+      categories: CATEGORIES,
       verbose: true,
+      iconFlavor: 'maki', // Options: 'maki', 'noto', 'material'
     });
 
     console.log('\n===========================================');

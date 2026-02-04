@@ -49,17 +49,40 @@ export interface TagMatcher {
   values: string[] | null; // null means match any value
 }
 
+// Localized string for translations
+export interface LocalizedString {
+  en: string;
+  es: string;
+  de: string;
+}
+
 export interface POISubcategory {
   name: string;
-  displayName: string;
+  displayName: LocalizedString;
+  icon: string; // Icon name (e.g., 'hospital', 'school')
+  color: string; // Hex color (e.g., '#E53935')
+  defaultActive: boolean; // Whether this subcategory is shown by default in the UI
   matchers: TagMatcher[];
 }
 
-export interface POICategory {
-  displayName: string;
-  matchers?: TagMatcher[]; // Optional for categories with only subcategories
-  subcategories?: POISubcategory[];
+// Category with subcategories - each subcategory has its own icon
+export interface POICategoryWithSubcategories {
+  displayName: LocalizedString;
+  icon: string; // Category-level icon (e.g., for category headers)
+  subcategories: POISubcategory[];
+  matchers?: never;
 }
+
+// Category without subcategories - must have its own icon and matchers
+export interface POICategoryWithMatchers {
+  displayName: LocalizedString;
+  icon: string; // Required when no subcategories
+  color: string; // Hex color (e.g., '#7B1FA2')
+  matchers: TagMatcher[];
+  subcategories?: never;
+}
+
+export type POICategory = POICategoryWithSubcategories | POICategoryWithMatchers;
 
 export type CategoriesConfig = Record<string, POICategory>;
 
@@ -101,17 +124,28 @@ export interface GeoJSONFeatureCollection {
   features: GeoJSONFeature[];
 }
 
-// Metadata Types
+// Metadata Types (using OSM-style localized keys)
 export interface SubcategoryMetadata {
   name: string;
-  displayName: string;
+  displayName: string; // Default (English)
+  'displayName:en': string;
+  'displayName:es': string;
+  'displayName:de': string;
+  defaultActive: boolean; // Whether this subcategory is shown by default in the UI
   count: number;
+  icon?: string; // SVG content for this subcategory
+  color?: string; // Hex color for this subcategory
 }
 
 export interface CategoryMetadata {
   name: string;
-  displayName: string;
+  displayName: string; // Default (English)
+  'displayName:en': string;
+  'displayName:es': string;
+  'displayName:de': string;
   count: number;
+  icon?: string; // SVG content for categories without subcategories
+  color?: string; // Hex color for categories without subcategories
   subcategories?: SubcategoryMetadata[];
 }
 

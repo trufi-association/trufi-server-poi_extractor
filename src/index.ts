@@ -41,7 +41,7 @@ export { extractFromOverpass } from './overpass-extractor.js';
 export type { OverpassExtractorOptions } from './overpass-extractor.js';
 
 // Export categories
-export { DEFAULT_CATEGORIES, loadCategories } from './categories.js';
+export { CATEGORIES, loadCategories } from './categories.js';
 
 // Export utilities
 export {
@@ -54,5 +54,17 @@ export {
   mergeConnectedWays,
   parseBbox,
   formatBbox,
-  isInBbox
+  isInBbox,
+  getMainTagValue
 } from './utils.js';
+
+// Export icon utilities
+export {
+  configureIcons,
+  loadIcon,
+  preloadIcons,
+  getCachedIcons,
+  clearIconCache,
+  listFlavors,
+  listIcons
+} from './icons.js';

@@ -12,6 +12,7 @@
 import fs from 'fs';
 import path from 'path';
 import { findCategory, createPointFeature, createPolygonFeature, formatBbox } from './utils.js';
+import { preloadIcons, getCachedIcons } from './icons.js';
 const OVERPASS_API_URL = 'https://overpass-api.de/api/interpreter';
 const OVERPASS_API_TIMEOUT = 180; // seconds
 /**
@@ -109,7 +110,7 @@ function processOverpassResponse(data, categories) {
         if (!categoryMatch)
             continue;
         if (element.type === 'node' && element.lat !== undefined && element.lon !== undefined) {
-            const feature = createPointFeature(element.id, element.lat, element.lon, element.tags, categoryMatch.category, 'node', categoryMatch.subcategory);
+            const feature = createPointFeature(element.id, element.lat, element.lon, element.tags, categoryMatch.category, 'node', categoryMatch.subcategory, categoryMatch.icon);
             poisByCategory[categoryMatch.category].push(feature);
         }
         else if (element.type === 'way' && element.nodes && element.nodes.length > 0) {
@@ -124,7 +125,7 @@ function processOverpassResponse(data, categories) {
                     .filter((n) => n !== undefined);
             }
             if (wayNodes.length >= 3) {
-                const feature = createPolygonFeature(wayNodes, element.tags, element.id, categoryMatch.category, 'way', categoryMatch.subcategory);
+                const feature = createPolygonFeature(wayNodes, element.tags, element.id, categoryMatch.category, 'way', categoryMatch.subcategory, categoryMatch.icon);
                 if (feature) {
                     poisByCategory[categoryMatch.category].push(feature);
                 }
@@ -133,7 +134,7 @@ function processOverpassResponse(data, categories) {
                 // Fall back to centroid point
                 const lat = wayNodes.reduce((sum, n) => sum + n.lat, 0) / wayNodes.length;
                 const lon = wayNodes.reduce((sum, n) => sum + n.lon, 0) / wayNodes.length;
-                const feature = createPointFeature(element.id, lat, lon, element.tags, categoryMatch.category, 'way', categoryMatch.subcategory);
+                const feature = createPointFeature(element.id, lat, lon, element.tags, categoryMatch.category, 'way', categoryMatch.subcategory, categoryMatch.icon);
                 poisByCategory[categoryMatch.category].push(feature);
             }
         }
@@ -158,13 +159,13 @@ function processOverpassResponse(data, categories) {
                     }
                 }
                 if (count > 0) {
-                    const feature = createPointFeature(element.id, centerLat / count, centerLon / count, element.tags, categoryMatch.category, 'relation', categoryMatch.subcategory);
+                    const feature = createPointFeature(element.id, centerLat / count, centerLon / count, element.tags, categoryMatch.category, 'relation', categoryMatch.subcategory, categoryMatch.icon);
                     poisByCategory[categoryMatch.category].push(feature);
                 }
             }
         }
     }
-    return poisByCategory;
+    return { poisByCategory };
 }
 export async function extractFromOverpass(options) {
     const { bbox, outputDir, categories, verbose = false, endpoint = OVERPASS_API_URL } = options;
@@ -192,9 +193,13 @@ export async function extractFromOverpass(options) {
     const data = await fetchOverpass(query, endpoint);
     log(`Received ${data.elements.length} elements`);
     log('');
+    // Load icons
+    log('Loading icons...');
+    preloadIcons(categories);
+    const iconCache = getCachedIcons();
     // Process response
     log('Processing elements...');
-    const poisByCategory = processOverpassResponse(data, categories);
+    const { poisByCategory } = processOverpassResponse(data, categories);
     // Calculate totals
     const counts = {};
     let total = 0;
@@ -218,7 +223,7 @@ export async function extractFromOverpass(options) {
         const outputFile = path.join(outputDir, `${name}.geojson`);
         fs.writeFileSync(outputFile, JSON.stringify(geojson, null, 2));
     }
-    // Create metadata with subcategory counts
+    // Create metadata with subcategory counts and icons
     const metadata = {
         generated: new Date().toISOString(),
         source: `overpass-api:${formatBbox(bbox)}`,
@@ -226,19 +231,30 @@ export async function extractFromOverpass(options) {
         categories: Object.keys(categories).map(name => {
             const category = categories[name];
             const categoryPOIs = poisByCategory[name];
-            // Calculate subcategory counts
+            // Calculate subcategory counts with icons
             let subcategoriesMetadata;
             if (category.subcategories && category.subcategories.length > 0) {
-                subcategoriesMetadata = category.subcategories.map(sub => ({
-                    name: sub.name,
-                    displayName: sub.displayName,
-                    count: categoryPOIs.filter(poi => poi.properties.subcategory === sub.name).length
-                }));
+                subcategoriesMetadata = category.subcategories.map(sub => {
+                    const subPOIs = categoryPOIs.filter(poi => poi.properties.subcategory === sub.name);
+                    const icon = iconCache.get(sub.icon);
+                    return {
+                        name: sub.name,
+                        displayName: sub.displayName,
+                        count: subPOIs.length,
+                        icon
+                    };
+                });
+            }
+            // For categories without subcategories, get category-level icon
+            let categoryIcon;
+            if (category.icon) {
+                categoryIcon = iconCache.get(category.icon);
             }
             return {
                 name,
                 displayName: category.displayName,
                 count: counts[name],
+                icon: categoryIcon,
                 subcategories: subcategoriesMetadata
             };
         }),

@@ -14,6 +14,7 @@ import path from 'path';
 import parseOSM from 'osm-pbf-parser';
 import through2 from 'through2';
 import { findCategory, createPointFeature, createPolygonFeature, createMultiPolygonFeature, isInBbox } from './utils.js';
+import { preloadIcons, getCachedIcons } from './icons.js';
 export async function extractFromPBF(options) {
     const { inputFile, outputDir, categories, bbox, verbose = false } = options;
     const log = verbose ? console.log.bind(console) : () => { };
@@ -35,6 +36,10 @@ export async function extractFromPBF(options) {
     for (const name of Object.keys(categories)) {
         poisByCategory[name] = [];
     }
+    // Load icons from categories
+    log('Loading icons...');
+    preloadIcons(categories);
+    const iconCache = getCachedIcons();
     log('Parsing PBF file...');
     const osm = parseOSM();
     let nodeCount = 0;
@@ -59,7 +64,7 @@ export async function extractFromPBF(options) {
                         nodeCount++;
                         const categoryMatch = findCategory(item.tags, categories);
                         if (categoryMatch) {
-                            const feature = createPointFeature(item.id, item.lat, item.lon, item.tags, categoryMatch.category, 'node', categoryMatch.subcategory);
+                            const feature = createPointFeature(item.id, item.lat, item.lon, item.tags, categoryMatch.category, 'node', categoryMatch.subcategory, categoryMatch.icon);
                             poisByCategory[categoryMatch.category].push(feature);
                             poiCount++;
                         }
@@ -84,7 +89,7 @@ export async function extractFromPBF(options) {
                             const hasName = item.tags?.name && !item.tags.name.toLowerCase().includes('jardinera');
                             const isLargeEnough = wayNodes.length >= 15;
                             if (hasName || isLargeEnough) {
-                                const feature = createPolygonFeature(wayNodes, item.tags, item.id, categoryMatch.category, 'way', categoryMatch.subcategory);
+                                const feature = createPolygonFeature(wayNodes, item.tags, item.id, categoryMatch.category, 'way', categoryMatch.subcategory, categoryMatch.icon);
                                 if (feature) {
                                     poisByCategory[categoryMatch.category].push(feature);
                                     poiCount++;
@@ -117,7 +122,7 @@ export async function extractFromPBF(options) {
                             const hasName = item.tags?.name && !item.tags.name.toLowerCase().includes('jardinera');
                             const totalNodes = outerWays.reduce((sum, way) => sum + way.length, 0);
                             if (totalNodes >= 15 || hasName) {
-                                const feature = createMultiPolygonFeature(outerWays, item.tags, item.id, categoryMatch.category, categoryMatch.subcategory);
+                                const feature = createMultiPolygonFeature(outerWays, item.tags, item.id, categoryMatch.category, categoryMatch.subcategory, categoryMatch.icon);
                                 if (feature) {
                                     poisByCategory[categoryMatch.category].push(feature);
                                     poiCount++;
@@ -154,7 +159,7 @@ export async function extractFromPBF(options) {
                 const outputFile = path.join(outputDir, `${name}.geojson`);
                 fs.writeFileSync(outputFile, JSON.stringify(geojson, null, 2));
             }
-            // Create metadata with subcategory counts
+            // Create metadata with subcategory counts and icons
             const metadata = {
                 generated: new Date().toISOString(),
                 source: path.basename(inputFile),
@@ -162,19 +167,30 @@ export async function extractFromPBF(options) {
                 categories: Object.keys(categories).map(name => {
                     const category = categories[name];
                     const categoryPOIs = poisByCategory[name];
-                    // Calculate subcategory counts
+                    // Calculate subcategory counts with icons
                     let subcategoriesMetadata;
                     if (category.subcategories && category.subcategories.length > 0) {
-                        subcategoriesMetadata = category.subcategories.map(sub => ({
-                            name: sub.name,
-                            displayName: sub.displayName,
-                            count: categoryPOIs.filter(poi => poi.properties.subcategory === sub.name).length
-                        }));
+                        subcategoriesMetadata = category.subcategories.map(sub => {
+                            const subPOIs = categoryPOIs.filter(poi => poi.properties.subcategory === sub.name);
+                            const icon = iconCache.get(sub.icon);
+                            return {
+                                name: sub.name,
+                                displayName: sub.displayName,
+                                count: subPOIs.length,
+                                icon
+                            };
+                        });
+                    }
+                    // For categories without subcategories, get category-level icon
+                    let categoryIcon;
+                    if (category.icon) {
+                        categoryIcon = iconCache.get(category.icon);
                     }
                     return {
                         name,
                         displayName: category.displayName,
                         count: counts[name],
+                        icon: categoryIcon,
                         subcategories: subcategoriesMetadata
                     };
                 }),

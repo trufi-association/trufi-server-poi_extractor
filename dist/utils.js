@@ -33,7 +33,7 @@ export function matchesCategory(tags, category) {
 }
 /**
  * Find which category and subcategory an element belongs to based on its tags
- * Returns: { category: string, subcategory?: string } or null
+ * Returns: { category: string, subcategory?: string, icon: string } or null
  */
 export function findCategory(tags, categories) {
     for (const [categoryName, category] of Object.entries(categories)) {
@@ -41,13 +41,13 @@ export function findCategory(tags, categories) {
         if (category.subcategories && category.subcategories.length > 0) {
             for (const subcategory of category.subcategories) {
                 if (matchesMatchers(tags, subcategory.matchers)) {
-                    return { category: categoryName, subcategory: subcategory.name };
+                    return { category: categoryName, subcategory: subcategory.name, icon: subcategory.icon };
                 }
             }
         }
         // Check category-level matchers if no subcategory matched
         if (category.matchers && matchesMatchers(tags, category.matchers)) {
-            return { category: categoryName };
+            return { category: categoryName, icon: category.icon || 'marker' };
         }
     }
     return null;
@@ -55,7 +55,7 @@ export function findCategory(tags, categories) {
 /**
  * Create a GeoJSON Point feature from an OSM node
  */
-export function createPointFeature(id, lat, lon, tags, category, osmType = 'node', subcategory) {
+export function createPointFeature(id, lat, lon, tags, category, osmType = 'node', subcategory, iconName) {
     return {
         type: 'Feature',
         id,
@@ -70,6 +70,7 @@ export function createPointFeature(id, lat, lon, tags, category, osmType = 'node
             category,
             subcategory,
             osmType,
+            iconName,
             ...tags
         }
     };
@@ -77,7 +78,7 @@ export function createPointFeature(id, lat, lon, tags, category, osmType = 'node
 /**
  * Create a GeoJSON Polygon feature from a list of nodes
  */
-export function createPolygonFeature(nodes, tags, osmId, category, osmType = 'way', subcategory) {
+export function createPolygonFeature(nodes, tags, osmId, category, osmType = 'way', subcategory, iconName) {
     if (!nodes || nodes.length < 3)
         return null;
     const coordinates = nodes.map(n => [n.lon, n.lat]);
@@ -102,6 +103,7 @@ export function createPolygonFeature(nodes, tags, osmId, category, osmType = 'wa
             category,
             subcategory,
             osmType,
+            iconName,
             ...tags
         }
     };
@@ -180,7 +182,7 @@ export function mergeConnectedWays(ways) {
 /**
  * Create a MultiPolygon feature from multiple outer ways
  */
-export function createMultiPolygonFeature(outerWays, tags, osmId, category, subcategory) {
+export function createMultiPolygonFeature(outerWays, tags, osmId, category, subcategory, iconName) {
     if (!outerWays || outerWays.length === 0)
         return null;
     const mergedWays = mergeConnectedWays(outerWays);
@@ -213,6 +215,7 @@ export function createMultiPolygonFeature(outerWays, tags, osmId, category, subc
             category,
             subcategory,
             osmType: 'relation',
+            iconName,
             ...tags
         }
     };
@@ -220,7 +223,7 @@ export function createMultiPolygonFeature(outerWays, tags, osmId, category, subc
 /**
  * Get the main tag value for type classification
  */
-function getMainTagValue(tags) {
+export function getMainTagValue(tags) {
     if (!tags)
         return 'unknown';
     const priorityKeys = ['amenity', 'tourism', 'shop', 'leisure', 'healthcare', 'historic', 'public_transport'];

@@ -16,7 +16,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { extractFromPBF } from './pbf-extractor.js';
 import { extractFromOverpass } from './overpass-extractor.js';
-import { DEFAULT_CATEGORIES, loadCategories } from './categories.js';
+import { CATEGORIES, loadCategories } from './categories.js';
 import { parseBbox } from './utils.js';
 import type { CategoriesConfig } from './types.js';
 
@@ -37,6 +37,7 @@ OPTIONS:
   -b, --bbox <bbox>        Bounding box: south,west,north,east (for Overpass API)
   -c, --categories <file>  Custom categories JSON file
   --only <categories>      Only extract specific categories (comma-separated)
+  --icons-flavor <flavor>  Icon flavor: maki, noto, material (default: maki)
   --endpoint <url>         Custom Overpass API endpoint
   -v, --verbose            Enable verbose output
   -h, --help               Show this help message
@@ -54,6 +55,9 @@ EXAMPLES:
 
   # Use custom categories
   poi-extractor -i city.osm.pbf -o ./output -c my-categories.json
+
+  # Use colored icons (noto emoji)
+  poi-extractor -i city.osm.pbf -o ./output --icons-flavor noto
 
   # Verbose output
   poi-extractor -i city.osm.pbf -o ./output -v
@@ -75,6 +79,7 @@ interface CLIOptions {
   bbox?: string;
   categories?: string;
   only?: string;
+  iconsFlavor?: string;
   endpoint?: string;
   verbose?: boolean;
   help?: boolean;
@@ -90,6 +95,7 @@ function parseArguments(): CLIOptions {
         bbox: { type: 'string', short: 'b' },
         categories: { type: 'string', short: 'c' },
         only: { type: 'string' },
+        'icons-flavor': { type: 'string' },
         endpoint: { type: 'string' },
         verbose: { type: 'boolean', short: 'v', default: false },
         help: { type: 'boolean', short: 'h', default: false },
@@ -97,7 +103,13 @@ function parseArguments(): CLIOptions {
       },
       strict: true,
     });
-    return values as CLIOptions;
+    // Map 'icons-flavor' to iconsFlavor
+    const result = values as Record<string, unknown>;
+    if (result['icons-flavor']) {
+      result.iconsFlavor = result['icons-flavor'];
+      delete result['icons-flavor'];
+    }
+    return result as CLIOptions;
   } catch (error) {
     if (error instanceof Error) {
       console.error(`Error: ${error.message}`);
@@ -161,7 +173,7 @@ async function main(): Promise<void> {
   // Load categories
   let categories = options.categories
     ? loadCategories(options.categories)
-    : DEFAULT_CATEGORIES;
+    : CATEGORIES;
 
   // Filter categories if --only is specified
   if (options.only) {
@@ -184,6 +196,7 @@ async function main(): Promise<void> {
         outputDir: outputPath,
         categories,
         verbose: options.verbose,
+        iconFlavor: options.iconsFlavor,
       });
     } else if (options.bbox) {
       // Overpass extraction
@@ -199,6 +212,7 @@ async function main(): Promise<void> {
         categories,
         verbose: options.verbose,
         endpoint: options.endpoint,
+        iconFlavor: options.iconsFlavor,
       });
     }
   } catch (error) {

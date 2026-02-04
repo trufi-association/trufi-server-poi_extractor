@@ -13,6 +13,7 @@ Extract Points of Interest (POIs) from OpenStreetMap data and output GeoJSON fil
 
 - **Dual Source Support**: Extract POIs from local `.osm.pbf` files or query the Overpass API directly
 - **GeoJSON Output**: Generate standard GeoJSON files for each POI category
+- **SVG Icons Included**: Each POI includes an inline SVG icon from [Maki Icons](https://github.com/mapbox/maki)
 - **Customizable Categories**: Use default categories or define your own via JSON configuration
 - **CLI & Library**: Use as a command-line tool or import as a library in your Node.js projects
 - **TypeScript**: Fully typed for excellent IDE support
@@ -229,7 +230,9 @@ Each category generates a GeoJSON FeatureCollection:
         "name": "Hospital del Norte",
         "type": "hospital",
         "category": "healthcare",
+        "subcategory": "hospital",
         "osmType": "node",
+        "iconName": "hospital",
         "amenity": "hospital",
         "addr:street": "Av. América"
       }
@@ -237,6 +240,43 @@ Each category generates a GeoJSON FeatureCollection:
   ]
 }
 ```
+
+## SVG Icons
+
+Icons are stored in `metadata.json` and referenced by `iconName` in each feature. This avoids duplicating SVG content across thousands of features.
+
+**Feature property:**
+```json
+"iconName": "hospital"
+```
+
+**metadata.json:**
+```json
+{
+  "icons": {
+    "hospital": "<?xml version=\"1.0\"...><svg>...</svg>",
+    "pharmacy": "<?xml version=\"1.0\"...><svg>...</svg>"
+  }
+}
+```
+
+Icons are automatically mapped based on the POI's `type` (OSM tag value). Common mappings:
+
+| Type | Icon |
+|------|------|
+| hospital | hospital |
+| pharmacy | pharmacy |
+| school | school |
+| university | college |
+| library | library |
+| restaurant | restaurant |
+| cafe | cafe |
+| hotel | lodging |
+| bank | bank |
+| police | police |
+| park | park |
+
+Icons are sourced from [Maki Icons](https://github.com/mapbox/maki), released under [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/) (Public Domain).
 
 ## Getting OSM Data
 
@@ -296,6 +336,7 @@ This project is licensed under the GNU General Public License v3.0 - see the [LI
 - [OpenStreetMap](https://www.openstreetmap.org/) contributors for the amazing map data
 - [Overpass API](https://wiki.openstreetmap.org/wiki/Overpass_API) for the query service
 - [osm-pbf-parser](https://github.com/substack/osm-pbf-parser) for PBF parsing
+- [Maki Icons](https://github.com/mapbox/maki) by Mapbox for POI icons (CC0 1.0)
 
 ---
 

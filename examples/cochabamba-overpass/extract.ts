@@ -9,7 +9,7 @@
 
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { extractFromOverpass, DEFAULT_CATEGORIES } from '../../src/index.js';
+import { extractFromOverpass, CATEGORIES } from '../../src/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -35,8 +35,9 @@ async function main() {
     const result = await extractFromOverpass({
       bbox: COCHABAMBA_BBOX,
       outputDir,
-      categories: DEFAULT_CATEGORIES,
+      categories: CATEGORIES,
       verbose: true,
+      iconFlavor: 'maki', // Options: 'maki', 'noto', 'material'
     });
 
     console.log('\n===========================================');

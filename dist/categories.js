@@ -16,6 +16,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'hospital',
                 displayName: 'Hospitals',
+                icon: 'hospital',
                 matchers: [
                     { key: 'amenity', values: ['hospital'] }
                 ]
@@ -23,6 +24,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'clinic',
                 displayName: 'Clinics & Doctors',
+                icon: 'doctor',
                 matchers: [
                     { key: 'amenity', values: ['clinic', 'doctors'] }
                 ]
@@ -30,6 +32,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'pharmacy',
                 displayName: 'Pharmacies',
+                icon: 'pharmacy',
                 matchers: [
                     { key: 'amenity', values: ['pharmacy'] }
                 ]
@@ -37,6 +40,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'dentist',
                 displayName: 'Dentists',
+                icon: 'dentist',
                 matchers: [
                     { key: 'amenity', values: ['dentist'] }
                 ]
@@ -44,6 +48,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'veterinary',
                 displayName: 'Veterinary',
+                icon: 'veterinary',
                 matchers: [
                     { key: 'amenity', values: ['veterinary'] }
                 ]
@@ -51,6 +56,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'other',
                 displayName: 'Other Healthcare',
+                icon: 'hospital',
                 matchers: [
                     { key: 'healthcare', values: null }
                 ]
@@ -63,6 +69,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'school',
                 displayName: 'Schools',
+                icon: 'school',
                 matchers: [
                     { key: 'amenity', values: ['school'] }
                 ]
@@ -70,6 +77,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'university',
                 displayName: 'Universities & Colleges',
+                icon: 'college',
                 matchers: [
                     { key: 'amenity', values: ['university', 'college'] }
                 ]
@@ -77,6 +85,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'kindergarten',
                 displayName: 'Kindergartens',
+                icon: 'school',
                 matchers: [
                     { key: 'amenity', values: ['kindergarten'] }
                 ]
@@ -84,6 +93,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'library',
                 displayName: 'Libraries',
+                icon: 'library',
                 matchers: [
                     { key: 'amenity', values: ['library'] }
                 ]
@@ -96,6 +106,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'public_transit',
                 displayName: 'Public Transit',
+                icon: 'bus',
                 matchers: [
                     { key: 'amenity', values: ['bus_station'] },
                     { key: 'public_transport', values: ['station', 'stop_position', 'platform'] },
@@ -105,6 +116,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'railway',
                 displayName: 'Railway',
+                icon: 'rail',
                 matchers: [
                     { key: 'railway', values: ['station', 'halt', 'tram_stop'] }
                 ]
@@ -112,6 +124,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'airport',
                 displayName: 'Airport',
+                icon: 'airport',
                 matchers: [
                     { key: 'aeroway', values: ['aerodrome', 'terminal'] }
                 ]
@@ -119,6 +132,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'taxi',
                 displayName: 'Taxi & Car Rental',
+                icon: 'car',
                 matchers: [
                     { key: 'amenity', values: ['taxi', 'car_rental'] }
                 ]
@@ -126,6 +140,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'ferry',
                 displayName: 'Ferry',
+                icon: 'ferry',
                 matchers: [
                     { key: 'amenity', values: ['ferry_terminal'] }
                 ]
@@ -138,6 +153,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'restaurant',
                 displayName: 'Restaurants',
+                icon: 'restaurant',
                 matchers: [
                     { key: 'amenity', values: ['restaurant'] }
                 ]
@@ -145,6 +161,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'cafe',
                 displayName: 'Cafes',
+                icon: 'cafe',
                 matchers: [
                     { key: 'amenity', values: ['cafe'] }
                 ]
@@ -152,6 +169,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'fast_food',
                 displayName: 'Fast Food',
+                icon: 'fast-food',
                 matchers: [
                     { key: 'amenity', values: ['fast_food', 'food_court'] }
                 ]
@@ -159,6 +177,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'bar',
                 displayName: 'Bars & Pubs',
+                icon: 'bar',
                 matchers: [
                     { key: 'amenity', values: ['bar', 'pub'] }
                 ]
@@ -166,6 +185,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'ice_cream',
                 displayName: 'Ice Cream',
+                icon: 'ice-cream',
                 matchers: [
                     { key: 'amenity', values: ['ice_cream'] }
                 ]
@@ -178,6 +198,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'supermarket',
                 displayName: 'Supermarkets',
+                icon: 'grocery',
                 matchers: [
                     { key: 'shop', values: ['supermarket', 'convenience'] }
                 ]
@@ -185,6 +206,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'mall',
                 displayName: 'Shopping Malls',
+                icon: 'shop',
                 matchers: [
                     { key: 'shop', values: ['mall', 'department_store'] }
                 ]
@@ -192,6 +214,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'food_shop',
                 displayName: 'Food Shops',
+                icon: 'bakery',
                 matchers: [
                     { key: 'shop', values: ['bakery', 'butcher', 'greengrocer'] }
                 ]
@@ -199,6 +222,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'marketplace',
                 displayName: 'Marketplaces',
+                icon: 'shop',
                 matchers: [
                     { key: 'amenity', values: ['marketplace'] }
                 ]
@@ -211,6 +235,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'accommodation',
                 displayName: 'Accommodation',
+                icon: 'lodging',
                 matchers: [
                     { key: 'tourism', values: ['hotel', 'motel', 'guest_house', 'hostel'] }
                 ]
@@ -218,6 +243,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'culture',
                 displayName: 'Cultural Sites',
+                icon: 'museum',
                 matchers: [
                     { key: 'tourism', values: ['museum', 'gallery', 'artwork'] }
                 ]
@@ -225,6 +251,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'attraction',
                 displayName: 'Attractions',
+                icon: 'attraction',
                 matchers: [
                     { key: 'tourism', values: ['attraction', 'viewpoint'] }
                 ]
@@ -232,6 +259,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'information',
                 displayName: 'Tourist Information',
+                icon: 'information',
                 matchers: [
                     { key: 'tourism', values: ['information'] }
                 ]
@@ -239,6 +267,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'historic',
                 displayName: 'Historic Sites',
+                icon: 'castle',
                 matchers: [
                     { key: 'historic', values: ['monument', 'memorial', 'castle', 'archaeological_site', 'ruins'] }
                 ]
@@ -251,6 +280,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'bank',
                 displayName: 'Banks',
+                icon: 'bank',
                 matchers: [
                     { key: 'amenity', values: ['bank'] }
                 ]
@@ -258,6 +288,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'atm',
                 displayName: 'ATMs',
+                icon: 'bank',
                 matchers: [
                     { key: 'amenity', values: ['atm'] }
                 ]
@@ -265,6 +296,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'exchange',
                 displayName: 'Currency Exchange',
+                icon: 'bank',
                 matchers: [
                     { key: 'amenity', values: ['bureau_de_change', 'money_transfer'] }
                 ]
@@ -277,6 +309,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'police',
                 displayName: 'Police',
+                icon: 'police',
                 matchers: [
                     { key: 'amenity', values: ['police'] }
                 ]
@@ -284,6 +317,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'fire',
                 displayName: 'Fire Station',
+                icon: 'fire-station',
                 matchers: [
                     { key: 'amenity', values: ['fire_station'] }
                 ]
@@ -291,6 +325,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'ambulance',
                 displayName: 'Ambulance',
+                icon: 'hospital',
                 matchers: [
                     { key: 'emergency', values: ['ambulance_station', 'emergency_ward_entrance'] }
                 ]
@@ -303,6 +338,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'park',
                 displayName: 'Parks & Gardens',
+                icon: 'park',
                 matchers: [
                     { key: 'leisure', values: ['park', 'garden', 'nature_reserve'] }
                 ]
@@ -310,6 +346,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'playground',
                 displayName: 'Playgrounds',
+                icon: 'playground',
                 matchers: [
                     { key: 'leisure', values: ['playground'] }
                 ]
@@ -317,6 +354,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'sports',
                 displayName: 'Sports Facilities',
+                icon: 'soccer',
                 matchers: [
                     { key: 'leisure', values: ['sports_centre', 'stadium', 'swimming_pool', 'fitness_centre'] }
                 ]
@@ -324,6 +362,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'entertainment',
                 displayName: 'Entertainment',
+                icon: 'cinema',
                 matchers: [
                     { key: 'amenity', values: ['cinema', 'theatre', 'nightclub'] }
                 ]
@@ -331,6 +370,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'community',
                 displayName: 'Community Centers',
+                icon: 'town-hall',
                 matchers: [
                     { key: 'amenity', values: ['community_centre'] }
                 ]
@@ -339,6 +379,7 @@ export const DEFAULT_CATEGORIES = {
     },
     religion: {
         displayName: 'Religion',
+        icon: 'place-of-worship',
         matchers: [
             { key: 'amenity', values: ['place_of_worship'] },
             { key: 'building', values: ['church', 'mosque', 'synagogue', 'temple'] }
@@ -350,6 +391,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'administration',
                 displayName: 'Government Offices',
+                icon: 'town-hall',
                 matchers: [
                     { key: 'amenity', values: ['townhall', 'courthouse'] },
                     { key: 'office', values: ['government', 'administrative'] }
@@ -358,6 +400,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'embassy',
                 displayName: 'Embassies',
+                icon: 'embassy',
                 matchers: [
                     { key: 'amenity', values: ['embassy'] }
                 ]
@@ -365,6 +408,7 @@ export const DEFAULT_CATEGORIES = {
             {
                 name: 'post',
                 displayName: 'Post Offices',
+                icon: 'post',
                 matchers: [
                     { key: 'amenity', values: ['post_office'] }
                 ]

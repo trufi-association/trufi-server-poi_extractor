@@ -30,6 +30,7 @@ import {
   createMultiPolygonFeature,
   isInBbox
 } from './utils.js';
+import { configureIcons, preloadIcons, getCachedIcons } from './icons.js';
 
 export interface PBFExtractorOptions {
   inputFile: string;
@@ -37,6 +38,7 @@ export interface PBFExtractorOptions {
   categories: CategoriesConfig;
   bbox?: BoundingBox;
   verbose?: boolean;
+  iconFlavor?: string;
 }
 
 export interface ExtractionResult {
@@ -45,9 +47,14 @@ export interface ExtractionResult {
 }
 
 export async function extractFromPBF(options: PBFExtractorOptions): Promise<ExtractionResult> {
-  const { inputFile, outputDir, categories, bbox, verbose = false } = options;
+  const { inputFile, outputDir, categories, bbox, verbose = false, iconFlavor } = options;
 
   const log = verbose ? console.log.bind(console) : () => {};
+
+  // Configure icon flavor if specified
+  if (iconFlavor) {
+    configureIcons({ flavor: iconFlavor });
+  }
 
   log('POI Extractor - PBF Mode');
   log('========================');
@@ -55,6 +62,9 @@ export async function extractFromPBF(options: PBFExtractorOptions): Promise<Extr
   log(`Output: ${outputDir}`);
   if (bbox) {
     log(`Bbox: ${bbox.south},${bbox.west},${bbox.north},${bbox.east}`);
+  }
+  if (iconFlavor) {
+    log(`Icon flavor: ${iconFlavor}`);
   }
   log('');
 
@@ -70,6 +80,11 @@ export async function extractFromPBF(options: PBFExtractorOptions): Promise<Extr
   for (const name of Object.keys(categories)) {
     poisByCategory[name] = [];
   }
+
+  // Load icons from categories
+  log('Loading icons...');
+  preloadIcons(categories);
+  const iconCache = getCachedIcons();
 
   log('Parsing PBF file...');
 
@@ -217,7 +232,7 @@ export async function extractFromPBF(options: PBFExtractorOptions): Promise<Extr
         for (const [name, pois] of Object.entries(poisByCategory)) {
           counts[name] = pois.length;
           if (verbose) {
-            log(`  ${categories[name].displayName}: ${pois.length}`);
+            log(`  ${categories[name].displayName.en}: ${pois.length}`);
           }
         }
         log('');
@@ -234,7 +249,7 @@ export async function extractFromPBF(options: PBFExtractorOptions): Promise<Extr
           fs.writeFileSync(outputFile, JSON.stringify(geojson, null, 2));
         }
 
-        // Create metadata with subcategory counts
+        // Create metadata with subcategory counts and icons
         const metadata: ExtractionMetadata = {
           generated: new Date().toISOString(),
           source: path.basename(inputFile),
@@ -243,20 +258,46 @@ export async function extractFromPBF(options: PBFExtractorOptions): Promise<Extr
             const category = categories[name];
             const categoryPOIs = poisByCategory[name];
 
-            // Calculate subcategory counts
+            // Calculate subcategory counts with icons and colors
             let subcategoriesMetadata;
             if (category.subcategories && category.subcategories.length > 0) {
-              subcategoriesMetadata = category.subcategories.map(sub => ({
-                name: sub.name,
-                displayName: sub.displayName,
-                count: categoryPOIs.filter(poi => poi.properties.subcategory === sub.name).length
-              }));
+              subcategoriesMetadata = category.subcategories.map(sub => {
+                const subPOIs = categoryPOIs.filter(poi => poi.properties.subcategory === sub.name);
+                const icon = iconCache.get(sub.icon);
+
+                return {
+                  name: sub.name,
+                  displayName: sub.displayName.en,
+                  'displayName:en': sub.displayName.en,
+                  'displayName:es': sub.displayName.es,
+                  'displayName:de': sub.displayName.de,
+                  defaultActive: sub.defaultActive,
+                  count: subPOIs.length,
+                  icon,
+                  color: sub.color
+                };
+              });
+            }
+
+            // For categories without subcategories, get category-level icon and color
+            let categoryIcon;
+            let categoryColor;
+            if (category.icon) {
+              categoryIcon = iconCache.get(category.icon);
+            }
+            if ('color' in category) {
+              categoryColor = category.color;
             }
 
             return {
               name,
-              displayName: category.displayName,
+              displayName: category.displayName.en,
+              'displayName:en': category.displayName.en,
+              'displayName:es': category.displayName.es,
+              'displayName:de': category.displayName.de,
               count: counts[name],
+              icon: categoryIcon,
+              color: categoryColor,
               subcategories: subcategoriesMetadata
             };
           }),

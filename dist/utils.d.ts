@@ -16,20 +16,21 @@ import type { OSMTags, POICategory, CategoriesConfig, GeoJSONFeature, CachedNode
 export declare function matchesCategory(tags: OSMTags, category: POICategory): boolean;
 /**
  * Find which category and subcategory an element belongs to based on its tags
- * Returns: { category: string, subcategory?: string } or null
+ * Returns: { category: string, subcategory?: string, icon: string } or null
  */
 export declare function findCategory(tags: OSMTags, categories: CategoriesConfig): {
     category: string;
     subcategory?: string;
+    icon: string;
 } | null;
 /**
  * Create a GeoJSON Point feature from an OSM node
  */
-export declare function createPointFeature(id: number, lat: number, lon: number, tags: OSMTags, category: string, osmType?: 'node' | 'way' | 'relation', subcategory?: string): GeoJSONFeature;
+export declare function createPointFeature(id: number, lat: number, lon: number, tags: OSMTags, category: string, osmType?: 'node' | 'way' | 'relation', subcategory?: string, iconName?: string): GeoJSONFeature;
 /**
  * Create a GeoJSON Polygon feature from a list of nodes
  */
-export declare function createPolygonFeature(nodes: CachedNode[], tags: OSMTags, osmId: number, category: string, osmType?: 'way' | 'relation', subcategory?: string): GeoJSONFeature | null;
+export declare function createPolygonFeature(nodes: CachedNode[], tags: OSMTags, osmId: number, category: string, osmType?: 'way' | 'relation', subcategory?: string, iconName?: string): GeoJSONFeature | null;
 /**
  * Calculate the centroid of a polygon
  */
@@ -44,7 +45,11 @@ export declare function mergeConnectedWays(ways: CachedNode[][]): CachedNode[][]
 /**
  * Create a MultiPolygon feature from multiple outer ways
  */
-export declare function createMultiPolygonFeature(outerWays: CachedNode[][], tags: OSMTags, osmId: number, category: string, subcategory?: string): GeoJSONFeature | null;
+export declare function createMultiPolygonFeature(outerWays: CachedNode[][], tags: OSMTags, osmId: number, category: string, subcategory?: string, iconName?: string): GeoJSONFeature | null;
+/**
+ * Get the main tag value for type classification
+ */
+export declare function getMainTagValue(tags: OSMTags): string;
 /**
  * Parse a bounding box string (south,west,north,east)
  */

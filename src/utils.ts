@@ -46,25 +46,34 @@ export function matchesCategory(tags: OSMTags, category: POICategory): boolean {
 
 /**
  * Find which category and subcategory an element belongs to based on its tags
- * Returns: { category: string, subcategory?: string } or null
+ * Returns: { category: string, subcategory?: string, icon: string, color: string } or null
  */
 export function findCategory(
   tags: OSMTags,
   categories: CategoriesConfig
-): { category: string; subcategory?: string } | null {
+): { category: string; subcategory?: string; icon: string; color: string } | null {
   for (const [categoryName, category] of Object.entries(categories)) {
     // Check subcategories first if they exist
     if (category.subcategories && category.subcategories.length > 0) {
       for (const subcategory of category.subcategories) {
         if (matchesMatchers(tags, subcategory.matchers)) {
-          return { category: categoryName, subcategory: subcategory.name };
+          return {
+            category: categoryName,
+            subcategory: subcategory.name,
+            icon: subcategory.icon,
+            color: subcategory.color
+          };
         }
       }
     }
 
     // Check category-level matchers if no subcategory matched
     if (category.matchers && matchesMatchers(tags, category.matchers)) {
-      return { category: categoryName };
+      return {
+        category: categoryName,
+        icon: category.icon || 'marker',
+        color: category.color || '#757575'
+      };
     }
   }
   return null;
@@ -279,7 +288,7 @@ export function createMultiPolygonFeature(
 /**
  * Get the main tag value for type classification
  */
-function getMainTagValue(tags: OSMTags): string {
+export function getMainTagValue(tags: OSMTags): string {
   if (!tags) return 'unknown';
   const priorityKeys = ['amenity', 'tourism', 'shop', 'leisure', 'healthcare', 'historic', 'public_transport'];
   for (const key of priorityKeys) {

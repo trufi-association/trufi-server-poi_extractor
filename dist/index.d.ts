@@ -18,5 +18,6 @@ export type { PBFExtractorOptions } from './pbf-extractor.js';
 export { extractFromOverpass } from './overpass-extractor.js';
 export type { OverpassExtractorOptions } from './overpass-extractor.js';
 export { DEFAULT_CATEGORIES, loadCategories } from './categories.js';
-export { matchesCategory, findCategory, createPointFeature, createPolygonFeature, createMultiPolygonFeature, calculateCentroid, mergeConnectedWays, parseBbox, formatBbox, isInBbox } from './utils.js';
+export { matchesCategory, findCategory, createPointFeature, createPolygonFeature, createMultiPolygonFeature, calculateCentroid, mergeConnectedWays, parseBbox, formatBbox, isInBbox, getMainTagValue } from './utils.js';
+export { configureIcons, loadIcon, preloadIcons, getCachedIcons, clearIconCache, listFlavors, listIcons } from './icons.js';
 //# sourceMappingURL=index.d.ts.map

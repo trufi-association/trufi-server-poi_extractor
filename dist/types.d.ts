@@ -43,10 +43,12 @@ export interface TagMatcher {
 export interface POISubcategory {
     name: string;
     displayName: string;
+    icon: string;
     matchers: TagMatcher[];
 }
 export interface POICategory {
     displayName: string;
+    icon?: string;
     matchers?: TagMatcher[];
     subcategories?: POISubcategory[];
 }
@@ -75,6 +77,7 @@ export interface GeoJSONFeature {
         category: string;
         subcategory?: string;
         osmType: 'node' | 'way' | 'relation';
+        iconName?: string;
         [key: string]: string | number | undefined;
     };
 }
@@ -86,11 +89,13 @@ export interface SubcategoryMetadata {
     name: string;
     displayName: string;
     count: number;
+    icon?: string;
 }
 export interface CategoryMetadata {
     name: string;
     displayName: string;
     count: number;
+    icon?: string;
     subcategories?: SubcategoryMetadata[];
 }
 export interface ExtractionMetadata {
