@@ -16,6 +16,7 @@ export interface PBFExtractorOptions {
     categories: CategoriesConfig;
     bbox?: BoundingBox;
     verbose?: boolean;
+    iconFlavor?: string;
 }
 export interface ExtractionResult {
     poisByCategory: Record<string, GeoJSONFeature[]>;

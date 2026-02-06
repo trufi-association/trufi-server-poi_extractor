@@ -12,7 +12,7 @@
 import fs from 'fs';
 import path from 'path';
 import { findCategory, createPointFeature, createPolygonFeature, formatBbox } from './utils.js';
-import { preloadIcons, getCachedIcons } from './icons.js';
+import { configureIcons, preloadIcons, getCachedIcons } from './icons.js';
 const OVERPASS_API_URL = 'https://overpass-api.de/api/interpreter';
 const OVERPASS_API_TIMEOUT = 180; // seconds
 /**
@@ -110,7 +110,7 @@ function processOverpassResponse(data, categories) {
         if (!categoryMatch)
             continue;
         if (element.type === 'node' && element.lat !== undefined && element.lon !== undefined) {
-            const feature = createPointFeature(element.id, element.lat, element.lon, element.tags, categoryMatch.category, 'node', categoryMatch.subcategory, categoryMatch.icon);
+            const feature = createPointFeature(element.id, element.lat, element.lon, element.tags, categoryMatch.category, 'node', categoryMatch.subcategory);
             poisByCategory[categoryMatch.category].push(feature);
         }
         else if (element.type === 'way' && element.nodes && element.nodes.length > 0) {
@@ -125,7 +125,7 @@ function processOverpassResponse(data, categories) {
                     .filter((n) => n !== undefined);
             }
             if (wayNodes.length >= 3) {
-                const feature = createPolygonFeature(wayNodes, element.tags, element.id, categoryMatch.category, 'way', categoryMatch.subcategory, categoryMatch.icon);
+                const feature = createPolygonFeature(wayNodes, element.tags, element.id, categoryMatch.category, 'way', categoryMatch.subcategory);
                 if (feature) {
                     poisByCategory[categoryMatch.category].push(feature);
                 }
@@ -134,7 +134,7 @@ function processOverpassResponse(data, categories) {
                 // Fall back to centroid point
                 const lat = wayNodes.reduce((sum, n) => sum + n.lat, 0) / wayNodes.length;
                 const lon = wayNodes.reduce((sum, n) => sum + n.lon, 0) / wayNodes.length;
-                const feature = createPointFeature(element.id, lat, lon, element.tags, categoryMatch.category, 'way', categoryMatch.subcategory, categoryMatch.icon);
+                const feature = createPointFeature(element.id, lat, lon, element.tags, categoryMatch.category, 'way', categoryMatch.subcategory);
                 poisByCategory[categoryMatch.category].push(feature);
             }
         }
@@ -159,7 +159,7 @@ function processOverpassResponse(data, categories) {
                     }
                 }
                 if (count > 0) {
-                    const feature = createPointFeature(element.id, centerLat / count, centerLon / count, element.tags, categoryMatch.category, 'relation', categoryMatch.subcategory, categoryMatch.icon);
+                    const feature = createPointFeature(element.id, centerLat / count, centerLon / count, element.tags, categoryMatch.category, 'relation', categoryMatch.subcategory);
                     poisByCategory[categoryMatch.category].push(feature);
                 }
             }
@@ -168,13 +168,20 @@ function processOverpassResponse(data, categories) {
     return { poisByCategory };
 }
 export async function extractFromOverpass(options) {
-    const { bbox, outputDir, categories, verbose = false, endpoint = OVERPASS_API_URL } = options;
+    const { bbox, outputDir, categories, verbose = false, endpoint = OVERPASS_API_URL, iconFlavor } = options;
     const log = verbose ? console.log.bind(console) : () => { };
+    // Configure icon flavor if specified
+    if (iconFlavor) {
+        configureIcons({ flavor: iconFlavor });
+    }
     log('POI Extractor - Overpass API Mode');
     log('=================================');
     log(`Bbox: ${formatBbox(bbox)}`);
     log(`Output: ${outputDir}`);
     log(`Endpoint: ${endpoint}`);
+    if (iconFlavor) {
+        log(`Icon flavor: ${iconFlavor}`);
+    }
     log('');
     if (!fs.existsSync(outputDir)) {
         fs.mkdirSync(outputDir, { recursive: true });
@@ -207,7 +214,7 @@ export async function extractFromOverpass(options) {
         counts[name] = pois.length;
         total += pois.length;
         if (verbose) {
-            log(`  ${categories[name].displayName}: ${pois.length}`);
+            log(`  ${categories[name].displayName.en}: ${pois.length}`);
         }
     }
     log('');
@@ -231,7 +238,7 @@ export async function extractFromOverpass(options) {
         categories: Object.keys(categories).map(name => {
             const category = categories[name];
             const categoryPOIs = poisByCategory[name];
-            // Calculate subcategory counts with icons
+            // Calculate subcategory counts with icons and colors
             let subcategoriesMetadata;
             if (category.subcategories && category.subcategories.length > 0) {
                 subcategoriesMetadata = category.subcategories.map(sub => {
@@ -239,22 +246,35 @@ export async function extractFromOverpass(options) {
                     const icon = iconCache.get(sub.icon);
                     return {
                         name: sub.name,
-                        displayName: sub.displayName,
+                        displayName: sub.displayName.en,
+                        'displayName:en': sub.displayName.en,
+                        'displayName:es': sub.displayName.es,
+                        'displayName:de': sub.displayName.de,
+                        defaultActive: sub.defaultActive,
                         count: subPOIs.length,
-                        icon
+                        icon,
+                        color: sub.color
                     };
                 });
             }
-            // For categories without subcategories, get category-level icon
+            // For categories without subcategories, get category-level icon and color
             let categoryIcon;
+            let categoryColor;
             if (category.icon) {
                 categoryIcon = iconCache.get(category.icon);
             }
+            if ('color' in category) {
+                categoryColor = category.color;
+            }
             return {
                 name,
-                displayName: category.displayName,
+                displayName: category.displayName.en,
+                'displayName:en': category.displayName.en,
+                'displayName:es': category.displayName.es,
+                'displayName:de': category.displayName.de,
                 count: counts[name],
                 icon: categoryIcon,
+                color: categoryColor,
                 subcategories: subcategoriesMetadata
             };
         }),

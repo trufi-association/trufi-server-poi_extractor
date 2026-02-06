@@ -16,7 +16,7 @@
 export { extractFromPBF } from './pbf-extractor.js';
 export { extractFromOverpass } from './overpass-extractor.js';
 // Export categories
-export { DEFAULT_CATEGORIES, loadCategories } from './categories.js';
+export { CATEGORIES, loadCategories } from './categories.js';
 // Export utilities
 export { matchesCategory, findCategory, createPointFeature, createPolygonFeature, createMultiPolygonFeature, calculateCentroid, mergeConnectedWays, parseBbox, formatBbox, isInBbox, getMainTagValue } from './utils.js';
 // Export icon utilities

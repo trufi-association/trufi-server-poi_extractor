@@ -10,6 +10,6 @@
  * (at your option) any later version.
  */
 import type { CategoriesConfig } from './types.js';
-export declare const DEFAULT_CATEGORIES: CategoriesConfig;
+export declare const CATEGORIES: CategoriesConfig;
 export declare function loadCategories(customPath?: string): CategoriesConfig;
 //# sourceMappingURL=categories.d.ts.map

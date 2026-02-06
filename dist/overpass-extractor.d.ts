@@ -16,6 +16,7 @@ export interface OverpassExtractorOptions {
     categories: CategoriesConfig;
     verbose?: boolean;
     endpoint?: string;
+    iconFlavor?: string;
 }
 export interface ExtractionResult {
     poisByCategory: Record<string, GeoJSONFeature[]>;

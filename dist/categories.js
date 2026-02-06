@@ -9,54 +9,67 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-export const DEFAULT_CATEGORIES = {
+export const CATEGORIES = {
     healthcare: {
-        displayName: 'Healthcare',
+        displayName: { en: 'Healthcare', es: 'Salud', de: 'Gesundheit' },
+        icon: 'hospital',
         subcategories: [
             {
                 name: 'hospital',
-                displayName: 'Hospitals',
+                displayName: { en: 'Hospitals', es: 'Hospitales', de: 'Krankenhäuser' },
                 icon: 'hospital',
+                color: '#E53935',
+                defaultActive: false,
                 matchers: [
                     { key: 'amenity', values: ['hospital'] }
                 ]
             },
             {
                 name: 'clinic',
-                displayName: 'Clinics & Doctors',
+                displayName: { en: 'Clinics & Doctors', es: 'Clínicas y Médicos', de: 'Kliniken & Ärzte' },
                 icon: 'doctor',
+                color: '#EF5350',
+                defaultActive: false,
                 matchers: [
                     { key: 'amenity', values: ['clinic', 'doctors'] }
                 ]
             },
             {
                 name: 'pharmacy',
-                displayName: 'Pharmacies',
+                displayName: { en: 'Pharmacies', es: 'Farmacias', de: 'Apotheken' },
                 icon: 'pharmacy',
+                color: '#43A047',
+                defaultActive: false,
                 matchers: [
                     { key: 'amenity', values: ['pharmacy'] }
                 ]
             },
             {
                 name: 'dentist',
-                displayName: 'Dentists',
+                displayName: { en: 'Dentists', es: 'Dentistas', de: 'Zahnärzte' },
                 icon: 'dentist',
+                color: '#42A5F5',
+                defaultActive: false,
                 matchers: [
                     { key: 'amenity', values: ['dentist'] }
                 ]
             },
             {
                 name: 'veterinary',
-                displayName: 'Veterinary',
+                displayName: { en: 'Veterinary', es: 'Veterinarias', de: 'Tierärzte' },
                 icon: 'veterinary',
+                color: '#8D6E63',
+                defaultActive: false,
                 matchers: [
                     { key: 'amenity', values: ['veterinary'] }
                 ]
             },
             {
                 name: 'other',
-                displayName: 'Other Healthcare',
+                displayName: { en: 'Other Healthcare', es: 'Otros Servicios de Salud', de: 'Sonstige Gesundheit' },
                 icon: 'hospital',
+                color: '#F44336',
+                defaultActive: false,
                 matchers: [
                     { key: 'healthcare', values: null }
                 ]
@@ -64,36 +77,45 @@ export const DEFAULT_CATEGORIES = {
         ]
     },
     education: {
-        displayName: 'Education',
+        displayName: { en: 'Education', es: 'Educación', de: 'Bildung' },
+        icon: 'school',
         subcategories: [
             {
                 name: 'school',
-                displayName: 'Schools',
+                displayName: { en: 'Schools', es: 'Escuelas', de: 'Schulen' },
                 icon: 'school',
+                color: '#1976D2',
+                defaultActive: false,
                 matchers: [
                     { key: 'amenity', values: ['school'] }
                 ]
             },
             {
                 name: 'university',
-                displayName: 'Universities & Colleges',
+                displayName: { en: 'Universities & Colleges', es: 'Universidades', de: 'Universitäten' },
                 icon: 'college',
+                color: '#1565C0',
+                defaultActive: false,
                 matchers: [
                     { key: 'amenity', values: ['university', 'college'] }
                 ]
             },
             {
                 name: 'kindergarten',
-                displayName: 'Kindergartens',
+                displayName: { en: 'Kindergartens', es: 'Jardines Infantiles', de: 'Kindergärten' },
                 icon: 'school',
+                color: '#42A5F5',
+                defaultActive: false,
                 matchers: [
                     { key: 'amenity', values: ['kindergarten'] }
                 ]
             },
             {
                 name: 'library',
-                displayName: 'Libraries',
+                displayName: { en: 'Libraries', es: 'Bibliotecas', de: 'Bibliotheken' },
                 icon: 'library',
+                color: '#5C6BC0',
+                defaultActive: false,
                 matchers: [
                     { key: 'amenity', values: ['library'] }
                 ]
@@ -101,12 +123,15 @@ export const DEFAULT_CATEGORIES = {
         ]
     },
     transport: {
-        displayName: 'Transport',
+        displayName: { en: 'Transport', es: 'Transporte', de: 'Verkehr' },
+        icon: 'bus',
         subcategories: [
             {
                 name: 'public_transit',
-                displayName: 'Public Transit',
+                displayName: { en: 'Public Transit', es: 'Transporte Público', de: 'Öffentlicher Nahverkehr' },
                 icon: 'bus',
+                color: '#F57C00',
+                defaultActive: false,
                 matchers: [
                     { key: 'amenity', values: ['bus_station'] },
                     { key: 'public_transport', values: ['station', 'stop_position', 'platform'] },
@@ -115,32 +140,40 @@ export const DEFAULT_CATEGORIES = {
             },
             {
                 name: 'railway',
-                displayName: 'Railway',
+                displayName: { en: 'Railway', es: 'Ferrocarril', de: 'Eisenbahn' },
                 icon: 'rail',
+                color: '#455A64',
+                defaultActive: false,
                 matchers: [
                     { key: 'railway', values: ['station', 'halt', 'tram_stop'] }
                 ]
             },
             {
                 name: 'airport',
-                displayName: 'Airport',
+                displayName: { en: 'Airport', es: 'Aeropuerto', de: 'Flughafen' },
                 icon: 'airport',
+                color: '#0288D1',
+                defaultActive: false,
                 matchers: [
                     { key: 'aeroway', values: ['aerodrome', 'terminal'] }
                 ]
             },
             {
                 name: 'taxi',
-                displayName: 'Taxi & Car Rental',
+                displayName: { en: 'Taxi & Car Rental', es: 'Taxi y Alquiler de Autos', de: 'Taxi & Autovermietung' },
                 icon: 'car',
+                color: '#FFC107',
+                defaultActive: false,
                 matchers: [
                     { key: 'amenity', values: ['taxi', 'car_rental'] }
                 ]
             },
             {
                 name: 'ferry',
-                displayName: 'Ferry',
+                displayName: { en: 'Ferry', es: 'Ferry', de: 'Fähre' },
                 icon: 'ferry',
+                color: '#0097A7',
+                defaultActive: false,
                 matchers: [
                     { key: 'amenity', values: ['ferry_terminal'] }
                 ]
@@ -148,44 +181,55 @@ export const DEFAULT_CATEGORIES = {
         ]
     },
     food: {
-        displayName: 'Food & Drink',
+        displayName: { en: 'Food & Drink', es: 'Comida y Bebida', de: 'Essen & Trinken' },
+        icon: 'restaurant',
         subcategories: [
             {
                 name: 'restaurant',
-                displayName: 'Restaurants',
+                displayName: { en: 'Restaurants', es: 'Restaurantes', de: 'Restaurants' },
                 icon: 'restaurant',
+                color: '#FF5722',
+                defaultActive: false,
                 matchers: [
                     { key: 'amenity', values: ['restaurant'] }
                 ]
             },
             {
                 name: 'cafe',
-                displayName: 'Cafes',
+                displayName: { en: 'Cafes', es: 'Cafeterías', de: 'Cafés' },
                 icon: 'cafe',
+                color: '#795548',
+                defaultActive: false,
                 matchers: [
                     { key: 'amenity', values: ['cafe'] }
                 ]
             },
             {
                 name: 'fast_food',
-                displayName: 'Fast Food',
+                displayName: { en: 'Fast Food', es: 'Comida Rápida', de: 'Schnellimbiss' },
                 icon: 'fast-food',
+                color: '#FF9800',
+                defaultActive: false,
                 matchers: [
                     { key: 'amenity', values: ['fast_food', 'food_court'] }
                 ]
             },
             {
                 name: 'bar',
-                displayName: 'Bars & Pubs',
+                displayName: { en: 'Bars & Pubs', es: 'Bares', de: 'Bars & Kneipen' },
                 icon: 'bar',
+                color: '#7B1FA2',
+                defaultActive: false,
                 matchers: [
                     { key: 'amenity', values: ['bar', 'pub'] }
                 ]
             },
             {
                 name: 'ice_cream',
-                displayName: 'Ice Cream',
+                displayName: { en: 'Ice Cream', es: 'Heladerías', de: 'Eisdiele' },
                 icon: 'ice-cream',
+                color: '#E91E63',
+                defaultActive: false,
                 matchers: [
                     { key: 'amenity', values: ['ice_cream'] }
                 ]
@@ -193,36 +237,45 @@ export const DEFAULT_CATEGORIES = {
         ]
     },
     shopping: {
-        displayName: 'Shopping',
+        displayName: { en: 'Shopping', es: 'Compras', de: 'Einkaufen' },
+        icon: 'shop',
         subcategories: [
             {
                 name: 'supermarket',
-                displayName: 'Supermarkets',
+                displayName: { en: 'Supermarkets', es: 'Supermercados', de: 'Supermärkte' },
                 icon: 'grocery',
+                color: '#7B1FA2',
+                defaultActive: false,
                 matchers: [
                     { key: 'shop', values: ['supermarket', 'convenience'] }
                 ]
             },
             {
                 name: 'mall',
-                displayName: 'Shopping Malls',
+                displayName: { en: 'Shopping Malls', es: 'Centros Comerciales', de: 'Einkaufszentren' },
                 icon: 'shop',
+                color: '#9C27B0',
+                defaultActive: false,
                 matchers: [
                     { key: 'shop', values: ['mall', 'department_store'] }
                 ]
             },
             {
                 name: 'food_shop',
-                displayName: 'Food Shops',
+                displayName: { en: 'Food Shops', es: 'Tiendas de Alimentos', de: 'Lebensmittelgeschäfte' },
                 icon: 'bakery',
+                color: '#8BC34A',
+                defaultActive: false,
                 matchers: [
                     { key: 'shop', values: ['bakery', 'butcher', 'greengrocer'] }
                 ]
             },
             {
                 name: 'marketplace',
-                displayName: 'Marketplaces',
+                displayName: { en: 'Marketplaces', es: 'Mercados', de: 'Märkte' },
                 icon: 'shop',
+                color: '#FF7043',
+                defaultActive: false,
                 matchers: [
                     { key: 'amenity', values: ['marketplace'] }
                 ]
@@ -230,44 +283,55 @@ export const DEFAULT_CATEGORIES = {
         ]
     },
     tourism: {
-        displayName: 'Tourism',
+        displayName: { en: 'Tourism', es: 'Turismo', de: 'Tourismus' },
+        icon: 'attraction',
         subcategories: [
             {
                 name: 'accommodation',
-                displayName: 'Accommodation',
+                displayName: { en: 'Accommodation', es: 'Alojamiento', de: 'Unterkunft' },
                 icon: 'lodging',
+                color: '#00897B',
+                defaultActive: false,
                 matchers: [
                     { key: 'tourism', values: ['hotel', 'motel', 'guest_house', 'hostel'] }
                 ]
             },
             {
                 name: 'culture',
-                displayName: 'Cultural Sites',
+                displayName: { en: 'Cultural Sites', es: 'Sitios Culturales', de: 'Kulturstätten' },
                 icon: 'museum',
+                color: '#5D4037',
+                defaultActive: false,
                 matchers: [
                     { key: 'tourism', values: ['museum', 'gallery', 'artwork'] }
                 ]
             },
             {
                 name: 'attraction',
-                displayName: 'Attractions',
+                displayName: { en: 'Attractions', es: 'Atracciones', de: 'Sehenswürdigkeiten' },
                 icon: 'attraction',
+                color: '#00BCD4',
+                defaultActive: false,
                 matchers: [
                     { key: 'tourism', values: ['attraction', 'viewpoint'] }
                 ]
             },
             {
                 name: 'information',
-                displayName: 'Tourist Information',
+                displayName: { en: 'Tourist Information', es: 'Información Turística', de: 'Touristeninformation' },
                 icon: 'information',
+                color: '#2196F3',
+                defaultActive: false,
                 matchers: [
                     { key: 'tourism', values: ['information'] }
                 ]
             },
             {
                 name: 'historic',
-                displayName: 'Historic Sites',
+                displayName: { en: 'Historic Sites', es: 'Sitios Históricos', de: 'Historische Stätten' },
                 icon: 'castle',
+                color: '#795548',
+                defaultActive: false,
                 matchers: [
                     { key: 'historic', values: ['monument', 'memorial', 'castle', 'archaeological_site', 'ruins'] }
                 ]
@@ -275,28 +339,35 @@ export const DEFAULT_CATEGORIES = {
         ]
     },
     finance: {
-        displayName: 'Finance',
+        displayName: { en: 'Finance', es: 'Finanzas', de: 'Finanzen' },
+        icon: 'bank',
         subcategories: [
             {
                 name: 'bank',
-                displayName: 'Banks',
+                displayName: { en: 'Banks', es: 'Bancos', de: 'Banken' },
                 icon: 'bank',
+                color: '#388E3C',
+                defaultActive: false,
                 matchers: [
                     { key: 'amenity', values: ['bank'] }
                 ]
             },
             {
                 name: 'atm',
-                displayName: 'ATMs',
+                displayName: { en: 'ATMs', es: 'Cajeros Automáticos', de: 'Geldautomaten' },
                 icon: 'bank',
+                color: '#43A047',
+                defaultActive: false,
                 matchers: [
                     { key: 'amenity', values: ['atm'] }
                 ]
             },
             {
                 name: 'exchange',
-                displayName: 'Currency Exchange',
+                displayName: { en: 'Currency Exchange', es: 'Casa de Cambio', de: 'Wechselstube' },
                 icon: 'bank',
+                color: '#66BB6A',
+                defaultActive: false,
                 matchers: [
                     { key: 'amenity', values: ['bureau_de_change', 'money_transfer'] }
                 ]
@@ -304,28 +375,35 @@ export const DEFAULT_CATEGORIES = {
         ]
     },
     emergency: {
-        displayName: 'Emergency',
+        displayName: { en: 'Emergency', es: 'Emergencias', de: 'Notfall' },
+        icon: 'police',
         subcategories: [
             {
                 name: 'police',
-                displayName: 'Police',
+                displayName: { en: 'Police', es: 'Policía', de: 'Polizei' },
                 icon: 'police',
+                color: '#1565C0',
+                defaultActive: false,
                 matchers: [
                     { key: 'amenity', values: ['police'] }
                 ]
             },
             {
                 name: 'fire',
-                displayName: 'Fire Station',
+                displayName: { en: 'Fire Station', es: 'Estación de Bomberos', de: 'Feuerwehr' },
                 icon: 'fire-station',
+                color: '#D32F2F',
+                defaultActive: false,
                 matchers: [
                     { key: 'amenity', values: ['fire_station'] }
                 ]
             },
             {
                 name: 'ambulance',
-                displayName: 'Ambulance',
+                displayName: { en: 'Ambulance', es: 'Ambulancia', de: 'Rettungsdienst' },
                 icon: 'hospital',
+                color: '#E53935',
+                defaultActive: false,
                 matchers: [
                     { key: 'emergency', values: ['ambulance_station', 'emergency_ward_entrance'] }
                 ]
@@ -333,44 +411,55 @@ export const DEFAULT_CATEGORIES = {
         ]
     },
     recreation: {
-        displayName: 'Recreation',
+        displayName: { en: 'Recreation', es: 'Recreación', de: 'Freizeit' },
+        icon: 'park',
         subcategories: [
             {
                 name: 'park',
-                displayName: 'Parks & Gardens',
+                displayName: { en: 'Parks & Gardens', es: 'Parques y Jardines', de: 'Parks & Gärten' },
                 icon: 'park',
+                color: '#4CAF50',
+                defaultActive: false,
                 matchers: [
                     { key: 'leisure', values: ['park', 'garden', 'nature_reserve'] }
                 ]
             },
             {
                 name: 'playground',
-                displayName: 'Playgrounds',
+                displayName: { en: 'Playgrounds', es: 'Parques Infantiles', de: 'Spielplätze' },
                 icon: 'playground',
+                color: '#FF9800',
+                defaultActive: false,
                 matchers: [
                     { key: 'leisure', values: ['playground'] }
                 ]
             },
             {
                 name: 'sports',
-                displayName: 'Sports Facilities',
+                displayName: { en: 'Sports Facilities', es: 'Instalaciones Deportivas', de: 'Sportanlagen' },
                 icon: 'soccer',
+                color: '#2196F3',
+                defaultActive: false,
                 matchers: [
                     { key: 'leisure', values: ['sports_centre', 'stadium', 'swimming_pool', 'fitness_centre'] }
                 ]
             },
             {
                 name: 'entertainment',
-                displayName: 'Entertainment',
+                displayName: { en: 'Entertainment', es: 'Entretenimiento', de: 'Unterhaltung' },
                 icon: 'cinema',
+                color: '#9C27B0',
+                defaultActive: false,
                 matchers: [
                     { key: 'amenity', values: ['cinema', 'theatre', 'nightclub'] }
                 ]
             },
             {
                 name: 'community',
-                displayName: 'Community Centers',
+                displayName: { en: 'Community Centers', es: 'Centros Comunitarios', de: 'Gemeindezentren' },
                 icon: 'town-hall',
+                color: '#607D8B',
+                defaultActive: false,
                 matchers: [
                     { key: 'amenity', values: ['community_centre'] }
                 ]
@@ -378,20 +467,24 @@ export const DEFAULT_CATEGORIES = {
         ]
     },
     religion: {
-        displayName: 'Religion',
+        displayName: { en: 'Religion', es: 'Religión', de: 'Religion' },
         icon: 'place-of-worship',
+        color: '#7B1FA2',
         matchers: [
             { key: 'amenity', values: ['place_of_worship'] },
             { key: 'building', values: ['church', 'mosque', 'synagogue', 'temple'] }
         ]
     },
     government: {
-        displayName: 'Government & Public Services',
+        displayName: { en: 'Government & Public Services', es: 'Gobierno y Servicios Públicos', de: 'Regierung & Öffentliche Dienste' },
+        icon: 'town-hall',
         subcategories: [
             {
                 name: 'administration',
-                displayName: 'Government Offices',
+                displayName: { en: 'Government Offices', es: 'Oficinas de Gobierno', de: 'Regierungsbüros' },
                 icon: 'town-hall',
+                color: '#455A64',
+                defaultActive: false,
                 matchers: [
                     { key: 'amenity', values: ['townhall', 'courthouse'] },
                     { key: 'office', values: ['government', 'administrative'] }
@@ -399,16 +492,20 @@ export const DEFAULT_CATEGORIES = {
             },
             {
                 name: 'embassy',
-                displayName: 'Embassies',
+                displayName: { en: 'Embassies', es: 'Embajadas', de: 'Botschaften' },
                 icon: 'embassy',
+                color: '#37474F',
+                defaultActive: false,
                 matchers: [
                     { key: 'amenity', values: ['embassy'] }
                 ]
             },
             {
                 name: 'post',
-                displayName: 'Post Offices',
+                displayName: { en: 'Post Offices', es: 'Correos', de: 'Postämter' },
                 icon: 'post',
+                color: '#FF8F00',
+                defaultActive: false,
                 matchers: [
                     { key: 'amenity', values: ['post_office'] }
                 ]
@@ -427,6 +524,6 @@ export function loadCategories(customPath) {
             console.warn(`Warning: Could not load custom categories from ${customPath}, using defaults`);
         }
     }
-    return DEFAULT_CATEGORIES;
+    return CATEGORIES;
 }
 //# sourceMappingURL=categories.js.map

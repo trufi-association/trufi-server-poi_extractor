@@ -14,16 +14,23 @@ import path from 'path';
 import parseOSM from 'osm-pbf-parser';
 import through2 from 'through2';
 import { findCategory, createPointFeature, createPolygonFeature, createMultiPolygonFeature, isInBbox } from './utils.js';
-import { preloadIcons, getCachedIcons } from './icons.js';
+import { configureIcons, preloadIcons, getCachedIcons } from './icons.js';
 export async function extractFromPBF(options) {
-    const { inputFile, outputDir, categories, bbox, verbose = false } = options;
+    const { inputFile, outputDir, categories, bbox, verbose = false, iconFlavor } = options;
     const log = verbose ? console.log.bind(console) : () => { };
+    // Configure icon flavor if specified
+    if (iconFlavor) {
+        configureIcons({ flavor: iconFlavor });
+    }
     log('POI Extractor - PBF Mode');
     log('========================');
     log(`Input: ${inputFile}`);
     log(`Output: ${outputDir}`);
     if (bbox) {
         log(`Bbox: ${bbox.south},${bbox.west},${bbox.north},${bbox.east}`);
+    }
+    if (iconFlavor) {
+        log(`Icon flavor: ${iconFlavor}`);
     }
     log('');
     if (!fs.existsSync(inputFile)) {
@@ -64,7 +71,7 @@ export async function extractFromPBF(options) {
                         nodeCount++;
                         const categoryMatch = findCategory(item.tags, categories);
                         if (categoryMatch) {
-                            const feature = createPointFeature(item.id, item.lat, item.lon, item.tags, categoryMatch.category, 'node', categoryMatch.subcategory, categoryMatch.icon);
+                            const feature = createPointFeature(item.id, item.lat, item.lon, item.tags, categoryMatch.category, 'node', categoryMatch.subcategory);
                             poisByCategory[categoryMatch.category].push(feature);
                             poiCount++;
                         }
@@ -89,7 +96,7 @@ export async function extractFromPBF(options) {
                             const hasName = item.tags?.name && !item.tags.name.toLowerCase().includes('jardinera');
                             const isLargeEnough = wayNodes.length >= 15;
                             if (hasName || isLargeEnough) {
-                                const feature = createPolygonFeature(wayNodes, item.tags, item.id, categoryMatch.category, 'way', categoryMatch.subcategory, categoryMatch.icon);
+                                const feature = createPolygonFeature(wayNodes, item.tags, item.id, categoryMatch.category, 'way', categoryMatch.subcategory);
                                 if (feature) {
                                     poisByCategory[categoryMatch.category].push(feature);
                                     poiCount++;
@@ -122,7 +129,7 @@ export async function extractFromPBF(options) {
                             const hasName = item.tags?.name && !item.tags.name.toLowerCase().includes('jardinera');
                             const totalNodes = outerWays.reduce((sum, way) => sum + way.length, 0);
                             if (totalNodes >= 15 || hasName) {
-                                const feature = createMultiPolygonFeature(outerWays, item.tags, item.id, categoryMatch.category, categoryMatch.subcategory, categoryMatch.icon);
+                                const feature = createMultiPolygonFeature(outerWays, item.tags, item.id, categoryMatch.category, categoryMatch.subcategory);
                                 if (feature) {
                                     poisByCategory[categoryMatch.category].push(feature);
                                     poiCount++;
@@ -145,7 +152,7 @@ export async function extractFromPBF(options) {
             for (const [name, pois] of Object.entries(poisByCategory)) {
                 counts[name] = pois.length;
                 if (verbose) {
-                    log(`  ${categories[name].displayName}: ${pois.length}`);
+                    log(`  ${categories[name].displayName.en}: ${pois.length}`);
                 }
             }
             log('');
@@ -167,7 +174,7 @@ export async function extractFromPBF(options) {
                 categories: Object.keys(categories).map(name => {
                     const category = categories[name];
                     const categoryPOIs = poisByCategory[name];
-                    // Calculate subcategory counts with icons
+                    // Calculate subcategory counts with icons and colors
                     let subcategoriesMetadata;
                     if (category.subcategories && category.subcategories.length > 0) {
                         subcategoriesMetadata = category.subcategories.map(sub => {
@@ -175,22 +182,35 @@ export async function extractFromPBF(options) {
                             const icon = iconCache.get(sub.icon);
                             return {
                                 name: sub.name,
-                                displayName: sub.displayName,
+                                displayName: sub.displayName.en,
+                                'displayName:en': sub.displayName.en,
+                                'displayName:es': sub.displayName.es,
+                                'displayName:de': sub.displayName.de,
+                                defaultActive: sub.defaultActive,
                                 count: subPOIs.length,
-                                icon
+                                icon,
+                                color: sub.color
                             };
                         });
                     }
-                    // For categories without subcategories, get category-level icon
+                    // For categories without subcategories, get category-level icon and color
                     let categoryIcon;
+                    let categoryColor;
                     if (category.icon) {
                         categoryIcon = iconCache.get(category.icon);
                     }
+                    if ('color' in category) {
+                        categoryColor = category.color;
+                    }
                     return {
                         name,
-                        displayName: category.displayName,
+                        displayName: category.displayName.en,
+                        'displayName:en': category.displayName.en,
+                        'displayName:es': category.displayName.es,
+                        'displayName:de': category.displayName.de,
                         count: counts[name],
                         icon: categoryIcon,
+                        color: categoryColor,
                         subcategories: subcategoriesMetadata
                     };
                 }),

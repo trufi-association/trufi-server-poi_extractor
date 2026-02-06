@@ -40,18 +40,33 @@ export interface TagMatcher {
     key: string;
     values: string[] | null;
 }
+export interface LocalizedString {
+    en: string;
+    es: string;
+    de: string;
+}
 export interface POISubcategory {
     name: string;
-    displayName: string;
+    displayName: LocalizedString;
     icon: string;
+    color: string;
+    defaultActive: boolean;
     matchers: TagMatcher[];
 }
-export interface POICategory {
-    displayName: string;
-    icon?: string;
-    matchers?: TagMatcher[];
-    subcategories?: POISubcategory[];
+export interface POICategoryWithSubcategories {
+    displayName: LocalizedString;
+    icon: string;
+    subcategories: POISubcategory[];
+    matchers?: never;
 }
+export interface POICategoryWithMatchers {
+    displayName: LocalizedString;
+    icon: string;
+    color: string;
+    matchers: TagMatcher[];
+    subcategories?: never;
+}
+export type POICategory = POICategoryWithSubcategories | POICategoryWithMatchers;
 export type CategoriesConfig = Record<string, POICategory>;
 export interface GeoJSONPointGeometry {
     type: 'Point';
@@ -77,7 +92,6 @@ export interface GeoJSONFeature {
         category: string;
         subcategory?: string;
         osmType: 'node' | 'way' | 'relation';
-        iconName?: string;
         [key: string]: string | number | undefined;
     };
 }
@@ -88,14 +102,23 @@ export interface GeoJSONFeatureCollection {
 export interface SubcategoryMetadata {
     name: string;
     displayName: string;
+    'displayName:en': string;
+    'displayName:es': string;
+    'displayName:de': string;
+    defaultActive: boolean;
     count: number;
     icon?: string;
+    color?: string;
 }
 export interface CategoryMetadata {
     name: string;
     displayName: string;
+    'displayName:en': string;
+    'displayName:es': string;
+    'displayName:de': string;
     count: number;
     icon?: string;
+    color?: string;
     subcategories?: SubcategoryMetadata[];
 }
 export interface ExtractionMetadata {
