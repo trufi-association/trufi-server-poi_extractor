@@ -308,25 +308,34 @@ export function getMainTagValue(tags: OSMTags): string {
 export const MAIN_TAG_KEYS = [
   'amenity', 'tourism', 'shop', 'leisure', 'healthcare', 'historic',
   'public_transport', 'office', 'craft', 'emergency', 'club', 'sport',
-  'man_made', 'landuse', 'natural', 'aeroway', 'railway', 'highway',
-  'building',
+  // `industrial=*` refines `landuse=industrial` / `man_made=works`, so it
+  // has to come before both.
+  'industrial', 'man_made', 'landuse', 'natural', 'aeroway', 'railway',
+  'highway', 'building',
 ];
 
-const ANNOTATION_PREFIXES = [
-  'addr:', 'name', 'alt_name', 'old_name', 'official_name', 'short_name',
-  'int_name', 'loc_name', 'nat_name', 'reg_name', 'brand', 'operator',
-  'contact:', 'source', 'website', 'url', 'email', 'phone', 'fax',
+/** Keys that annotate a feature: a bare key, or that key with a `:` suffix. */
+const ANNOTATION_KEYS = [
+  'brand', 'operator', 'source', 'website', 'url', 'email', 'phone', 'fax',
   'opening_hours', 'wikidata', 'wikipedia', 'wikimedia_commons', 'image',
   'description', 'note', 'fixme', 'ref', 'check_date', 'survey:date',
-  'level', 'layer', 'ele', 'start_date', 'is_in', 'payment:', 'diet:',
-  'cuisine', 'capacity', 'wheelchair', 'internet_access', 'smoking',
-  'toilets', 'air_conditioning', 'drive_through', 'delivery', 'takeaway',
-  'outdoor_seating', 'colour', 'type', 'access', 'area',
+  'level', 'layer', 'ele', 'start_date', 'is_in', 'cuisine', 'capacity',
+  'wheelchair', 'internet_access', 'smoking', 'toilets', 'air_conditioning',
+  'drive_through', 'delivery', 'takeaway', 'outdoor_seating', 'colour',
+  'type', 'access', 'area',
 ];
+
+/** Namespaces whose every key annotates (`addr:street`, `contact:phone`...). */
+const ANNOTATION_NAMESPACES = ['addr:', 'contact:', 'payment:', 'diet:'];
+
+/** `name`, `name:en`, `alt_name`, `old_name:ar`, `name_1`... */
+const NAME_FAMILY = /^(?:[a-z0-9_]+_)?name(?:_\d+)?(?::|$)/;
 
 /** Whether an OSM key annotates a feature instead of classifying it. */
 export function isAnnotationTag(key: string): boolean {
-  return ANNOTATION_PREFIXES.some(prefix => key === prefix || key.startsWith(prefix));
+  if (NAME_FAMILY.test(key)) return true;
+  if (ANNOTATION_NAMESPACES.some(ns => key.startsWith(ns))) return true;
+  return ANNOTATION_KEYS.some(k => key === k || key.startsWith(k + ':'));
 }
 
 /**
