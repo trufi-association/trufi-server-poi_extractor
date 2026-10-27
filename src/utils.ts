@@ -290,11 +290,43 @@ export function createMultiPolygonFeature(
  */
 export function getMainTagValue(tags: OSMTags): string {
   if (!tags) return 'unknown';
-  const priorityKeys = ['amenity', 'tourism', 'shop', 'leisure', 'healthcare', 'historic', 'public_transport'];
-  for (const key of priorityKeys) {
+  for (const key of MAIN_TAG_KEYS) {
     if (tags[key]) return tags[key];
   }
-  return tags[Object.keys(tags)[0]] || 'unknown';
+  // No well-known classifying key: take the first tag that describes what
+  // the feature *is*, never one that only annotates it (addresses, names,
+  // contacts, sources...). `addr:city` used to win here for office=* and
+  // craft=* nodes, whose address tags come first in the PBF.
+  for (const key of Object.keys(tags)) {
+    if (isAnnotationTag(key)) continue;
+    if (tags[key]) return tags[key];
+  }
+  return 'unknown';
+}
+
+/** Keys whose value names the kind of place, most specific first. */
+export const MAIN_TAG_KEYS = [
+  'amenity', 'tourism', 'shop', 'leisure', 'healthcare', 'historic',
+  'public_transport', 'office', 'craft', 'emergency', 'club', 'sport',
+  'man_made', 'landuse', 'natural', 'aeroway', 'railway', 'highway',
+  'building',
+];
+
+const ANNOTATION_PREFIXES = [
+  'addr:', 'name', 'alt_name', 'old_name', 'official_name', 'short_name',
+  'int_name', 'loc_name', 'nat_name', 'reg_name', 'brand', 'operator',
+  'contact:', 'source', 'website', 'url', 'email', 'phone', 'fax',
+  'opening_hours', 'wikidata', 'wikipedia', 'wikimedia_commons', 'image',
+  'description', 'note', 'fixme', 'ref', 'check_date', 'survey:date',
+  'level', 'layer', 'ele', 'start_date', 'is_in', 'payment:', 'diet:',
+  'cuisine', 'capacity', 'wheelchair', 'internet_access', 'smoking',
+  'toilets', 'air_conditioning', 'drive_through', 'delivery', 'takeaway',
+  'outdoor_seating', 'colour', 'type', 'access', 'area',
+];
+
+/** Whether an OSM key annotates a feature instead of classifying it. */
+export function isAnnotationTag(key: string): boolean {
+  return ANNOTATION_PREFIXES.some(prefix => key === prefix || key.startsWith(prefix));
 }
 
 /**

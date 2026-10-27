@@ -29,7 +29,8 @@
     "prepublishOnly": "npm run clean && npm run build",
     "typecheck": "tsc --noEmit",
     "extract:pbf": "tsx src/cli.ts -i base.osm.pbf -o ./out -v",
-    "extract:overpass": "tsx src/cli.ts --bbox -17.45,-66.25,-17.30,-66.10 -o ./out -v"
+    "extract:overpass": "tsx src/cli.ts --bbox -17.45,-66.25,-17.30,-66.10 -o ./out -v",
+    "test": "tsx --test test/*.test.ts"
   },
   "keywords": [
     "osm",
