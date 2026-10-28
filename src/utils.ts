@@ -318,7 +318,8 @@ export const MAIN_TAG_KEYS = [
 const ANNOTATION_KEYS = [
   'brand', 'operator', 'source', 'website', 'url', 'email', 'phone', 'fax',
   'opening_hours', 'wikidata', 'wikipedia', 'wikimedia_commons', 'image',
-  'description', 'note', 'fixme', 'ref', 'check_date', 'survey:date',
+  'description', 'note', 'fixme', 'ref', 'source_ref', 'check_date', 'survey:date',
+  'noname', 'delivery_hours',
   'level', 'layer', 'ele', 'start_date', 'is_in', 'cuisine', 'capacity',
   'wheelchair', 'internet_access', 'smoking', 'toilets', 'air_conditioning',
   'drive_through', 'delivery', 'takeaway', 'outdoor_seating', 'colour',
@@ -331,11 +332,17 @@ const ANNOTATION_NAMESPACES = ['addr:', 'contact:', 'payment:', 'diet:'];
 /** `name`, `name:en`, `alt_name`, `old_name:ar`, `name_1`... */
 const NAME_FAMILY = /^(?:[a-z0-9_]+_)?name(?:_\d+)?(?::|$)/;
 
+/** `_1`, `_2`: the suffix OSM gives to a second copy of a tag. */
+const NUMBERED = /^_\d+$/;
+
 /** Whether an OSM key annotates a feature instead of classifying it. */
 export function isAnnotationTag(key: string): boolean {
   if (NAME_FAMILY.test(key)) return true;
   if (ANNOTATION_NAMESPACES.some(ns => key.startsWith(ns))) return true;
-  return ANNOTATION_KEYS.some(k => key === k || key.startsWith(k + ':'));
+  // `phone_1`, `image_2`: a numbered copy of an annotation is still one.
+  return ANNOTATION_KEYS.some(
+    k => key === k || key.startsWith(k + ':') || (key.startsWith(k + '_') && NUMBERED.test(key.slice(k.length)))
+  );
 }
 
 /**

@@ -33,7 +33,7 @@ test('an unlisted classifying key is still picked over annotations', () => {
 });
 
 test('isAnnotationTag covers the namespaces that never classify', () => {
-  for (const k of ['addr:city', 'name:en', 'contact:phone', 'source:date', 'opening_hours', 'wikidata', 'brand:wikidata', 'payment:cash']) {
+  for (const k of ['addr:city', 'name:en', 'contact:phone', 'source:date', 'opening_hours', 'wikidata', 'brand:wikidata', 'payment:cash', 'source_ref', 'noname', 'delivery_hours', 'phone_1', 'image_2']) {
     assert.equal(isAnnotationTag(k), true, k);
   }
   for (const k of ['amenity', 'office', 'craft', 'shop', 'military']) {
@@ -57,7 +57,7 @@ test('annotation keys match whole keys or namespaces, not loose prefixes', () =>
   for (const k of ['name_1', 'alt_name:en', 'old_name', 'name:ar', 'addr:city', 'contact:phone', 'source:date', 'ref:bag']) {
     assert.equal(isAnnotationTag(k), true, k);
   }
-  for (const k of ['delivery_hours', 'electrified', 'electronics_repair', 'typewriter', 'levelcrossing']) {
+  for (const k of ['electrified', 'electronics_repair', 'typewriter', 'levelcrossing']) {
     assert.equal(isAnnotationTag(k), false, k);
   }
 });
