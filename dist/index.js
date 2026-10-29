@@ -18,7 +18,7 @@ export { extractFromOverpass } from './overpass-extractor.js';
 // Export categories
 export { CATEGORIES, loadCategories } from './categories.js';
 // Export utilities
-export { matchesCategory, findCategory, createPointFeature, createPolygonFeature, createMultiPolygonFeature, calculateCentroid, mergeConnectedWays, parseBbox, formatBbox, isInBbox, getMainTagValue } from './utils.js';
+export { matchesCategory, findCategory, createPointFeature, createPolygonFeature, createMultiPolygonFeature, calculateCentroid, mergeConnectedWays, parseBbox, formatBbox, isInBbox, getMainTagValue, MAIN_TAG_KEYS, isAnnotationTag } from './utils.js';
 // Export icon utilities
 export { configureIcons, loadIcon, preloadIcons, getCachedIcons, clearIconCache, listFlavors, listIcons } from './icons.js';
 //# sourceMappingURL=index.js.map

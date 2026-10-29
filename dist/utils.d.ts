@@ -51,6 +51,10 @@ export declare function createMultiPolygonFeature(outerWays: CachedNode[][], tag
  * Get the main tag value for type classification
  */
 export declare function getMainTagValue(tags: OSMTags): string;
+/** Keys whose value names the kind of place, most specific first. */
+export declare const MAIN_TAG_KEYS: string[];
+/** Whether an OSM key annotates a feature instead of classifying it. */
+export declare function isAnnotationTag(key: string): boolean;
 /**
  * Parse a bounding box string (south,west,north,east)
  */

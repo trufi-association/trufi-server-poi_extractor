@@ -290,11 +290,59 @@ export function createMultiPolygonFeature(
  */
 export function getMainTagValue(tags: OSMTags): string {
   if (!tags) return 'unknown';
-  const priorityKeys = ['amenity', 'tourism', 'shop', 'leisure', 'healthcare', 'historic', 'public_transport'];
-  for (const key of priorityKeys) {
+  for (const key of MAIN_TAG_KEYS) {
     if (tags[key]) return tags[key];
   }
-  return tags[Object.keys(tags)[0]] || 'unknown';
+  // No well-known classifying key: take the first tag that describes what
+  // the feature *is*, never one that only annotates it (addresses, names,
+  // contacts, sources...). `addr:city` used to win here for office=* and
+  // craft=* nodes, whose address tags come first in the PBF.
+  for (const key of Object.keys(tags)) {
+    if (isAnnotationTag(key)) continue;
+    if (tags[key]) return tags[key];
+  }
+  return 'unknown';
+}
+
+/** Keys whose value names the kind of place, most specific first. */
+export const MAIN_TAG_KEYS = [
+  'amenity', 'tourism', 'shop', 'leisure', 'healthcare', 'historic',
+  'public_transport', 'office', 'craft', 'emergency', 'club', 'sport',
+  // `industrial=*` refines `landuse=industrial` / `man_made=works`, so it
+  // has to come before both.
+  'industrial', 'man_made', 'landuse', 'natural', 'aeroway', 'railway',
+  'highway', 'building',
+];
+
+/** Keys that annotate a feature: a bare key, or that key with a `:` suffix. */
+const ANNOTATION_KEYS = [
+  'brand', 'operator', 'source', 'website', 'url', 'email', 'phone', 'fax',
+  'opening_hours', 'wikidata', 'wikipedia', 'wikimedia_commons', 'image',
+  'description', 'note', 'fixme', 'ref', 'source_ref', 'check_date', 'survey:date',
+  'noname', 'delivery_hours',
+  'level', 'layer', 'ele', 'start_date', 'is_in', 'cuisine', 'capacity',
+  'wheelchair', 'internet_access', 'smoking', 'toilets', 'air_conditioning',
+  'drive_through', 'delivery', 'takeaway', 'outdoor_seating', 'colour',
+  'type', 'access', 'area',
+];
+
+/** Namespaces whose every key annotates (`addr:street`, `contact:phone`...). */
+const ANNOTATION_NAMESPACES = ['addr:', 'contact:', 'payment:', 'diet:'];
+
+/** `name`, `name:en`, `alt_name`, `old_name:ar`, `name_1`... */
+const NAME_FAMILY = /^(?:[a-z0-9_]+_)?name(?:_\d+)?(?::|$)/;
+
+/** `_1`, `_2`: the suffix OSM gives to a second copy of a tag. */
+const NUMBERED = /^_\d+$/;
+
+/** Whether an OSM key annotates a feature instead of classifying it. */
+export function isAnnotationTag(key: string): boolean {
+  if (NAME_FAMILY.test(key)) return true;
+  if (ANNOTATION_NAMESPACES.some(ns => key.startsWith(ns))) return true;
+  // `phone_1`, `image_2`: a numbered copy of an annotation is still one.
+  return ANNOTATION_KEYS.some(
+    k => key === k || key.startsWith(k + ':') || (key.startsWith(k + '_') && NUMBERED.test(key.slice(k.length)))
+  );
 }
 
 /**

@@ -55,7 +55,9 @@ export {
   parseBbox,
   formatBbox,
   isInBbox,
-  getMainTagValue
+  getMainTagValue,
+  MAIN_TAG_KEYS,
+  isAnnotationTag
 } from './utils.js';
 
 // Export icon utilities
